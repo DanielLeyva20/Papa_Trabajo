@@ -14,7 +14,8 @@ import { partesMes } from '../../core/services/calendario';
 import { Catalogo } from '../../core/services/catalogo';
 import { Confirmacion } from '../../core/services/confirmacion';
 import { Deslizante } from '../../core/ui/deslizante';
-import { Icono } from '../../core/ui/icono';
+import type { VistaTurno } from '../../core/models/dominio';
+import { Icono, type NombreIcono } from '../../core/ui/icono';
 import { CuadriculaRol, type PedidoMarca } from './componentes/cuadricula-rol';
 import { DialogoGenerar, type OpcionesGenerar } from './componentes/dialogo-generar';
 import { PaletaSellos } from './componentes/paleta-sellos';
@@ -36,6 +37,13 @@ export class RolPage {
   private readonly dialogoGenerar = viewChild.required(DialogoGenerar);
 
   protected readonly mes = this.store.mesSeleccionado;
+
+  protected readonly vistas: { valor: VistaTurno; etiqueta: string; icono: NombreIcono }[] = [
+    { valor: 'juntos', etiqueta: 'Todos juntos', icono: 'SunMoon' },
+    { valor: 'separados', etiqueta: 'Separados', icono: 'Rows2' },
+    { valor: 'dia', etiqueta: 'Día', icono: 'Sun' },
+    { valor: 'noche', etiqueta: 'Noche', icono: 'Moon' },
+  ];
 
   /** false cuando el título grande del mes salió de la pantalla al bajar. */
   protected readonly tituloVisible = signal(true);

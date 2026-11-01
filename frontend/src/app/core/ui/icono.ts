@@ -34,6 +34,14 @@ import {
   Users,
   Wand,
   X,
+  Sun,
+  Moon,
+  SunMoon,
+  FileUp,
+  Rows2,
+  TriangleAlert,
+  ArrowRight,
+  RotateCcw,
   type IconNode,
 } from 'lucide';
 
@@ -72,6 +80,14 @@ const ICONOS = {
   Users,
   Wand,
   X,
+  Sun,
+  Moon,
+  SunMoon,
+  FileUp,
+  Rows2,
+  TriangleAlert,
+  ArrowRight,
+  RotateCcw,
 } satisfies Record<string, IconNode>;
 
 export type NombreIcono = keyof typeof ICONOS;

@@ -1,0 +1,261 @@
+@let paso = store.paso();
+
+<div class="pagina">
+  <header class="cabecera">
+    <a class="volver" routerLink="/descargas">
+      <app-icono nombre="ChevronLeft" [tamano]="18" [trazo]="2.5" />
+      Descargas
+    </a>
+    <h1 class="titulo-grande">Importar desde Excel</h1>
+    <ol class="pasos" aria-label="Pasos">
+      <li [class.pasos__actual]="paso === 'elegir' || paso === 'leyendo'" [class.pasos__hecho]="paso === 'revisar' || paso === 'guardando' || paso === 'listo'">
+        <span>1</span> Elegir el archivo
+      </li>
+      <li [class.pasos__actual]="paso === 'revisar' || paso === 'guardando'" [class.pasos__hecho]="paso === 'listo'">
+        <span>2</span> Revisar
+      </li>
+      <li [class.pasos__actual]="paso === 'listo'"><span>3</span> Listo</li>
+    </ol>
+  </header>
+
+  @switch (paso) {
+    @case ('elegir') {
+      <label
+        class="zona tarjeta aparecer"
+        [class.zona--encima]="encima()"
+        (dragover)="alArrastrar($event)"
+        (dragleave)="encima.set(false)"
+        (drop)="alSoltar($event)"
+      >
+        <input
+          type="file"
+          class="solo-lectores"
+          accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          (change)="alElegir($event)"
+        />
+        <span class="zona__icono"><app-icono nombre="FileUp" [tamano]="34" [trazo]="1.75" /></span>
+        <strong class="zona__titulo">Arrastre aquí el Excel del rol</strong>
+        <span class="zona__texto">o <span class="zona__enlace">haga clic para elegirlo</span> en su PC</span>
+        <span class="zona__pista">
+          Sirve el Excel que usted ya llena (una tabla por sede, con los días arriba) y también el que descarga de este
+          sistema. Archivos .xlsx de hasta 10 MB.
+        </span>
+      </label>
+
+      <ul class="explicacion">
+        <li>
+          <app-icono nombre="Check" [tamano]="16" [trazo]="2.5" />
+          Lee cada sede, cada agente con su cargo y cada marca del mes, tal como está en el Excel.
+        </li>
+        <li>
+          <app-icono nombre="Check" [tamano]="16" [trazo]="2.5" />
+          Los casilleros vacíos del Excel quedan vacíos en el sistema.
+        </li>
+        <li>
+          <app-icono nombre="Check" [tamano]="16" [trazo]="2.5" />
+          Antes de guardar le muestra todo para que lo revise. Nada se guarda sin su confirmación.
+        </li>
+      </ul>
+    }
+
+    @case ('leyendo') {
+      <section class="leyendo tarjeta" role="status">
+        <app-icono class="girando" nombre="LoaderCircle" [tamano]="30" />
+        <p>Leyendo <strong>{{ store.archivo() }}</strong>…</p>
+      </section>
+    }
+
+    @case ('listo') {
+      @if (store.resultado(); as r) {
+        <section class="listo tarjeta aparecer" role="status">
+          <span class="listo__icono"><app-icono nombre="Check" [tamano]="34" [trazo]="3" /></span>
+          <h2 class="subtitulo">Rol de {{ store.mes.nombre() }} importado</h2>
+          <dl class="cifras">
+            <div><dt>Marcas guardadas</dt><dd>{{ r.marcasGuardadas }}</dd></div>
+            @if (r.marcasBorradas) {
+              <div><dt>Casilleros vaciados</dt><dd>{{ r.marcasBorradas }}</dd></div>
+            }
+            <div><dt>Agentes nuevos</dt><dd>{{ r.agentesNuevos }}</dd></div>
+            @if (r.agentesReactivados) {
+              <div><dt>Reactivados</dt><dd>{{ r.agentesReactivados }}</dd></div>
+            }
+            <div><dt>Asignados a una sede</dt><dd>{{ r.asignacionesNuevas }}</dd></div>
+          </dl>
+          @if (r.agentesNuevos) {
+            <p class="texto-secundario">
+              Puede completar el DNI, teléfono y foto de los agentes nuevos en <a routerLink="/personal">Personal</a>.
+            </p>
+          }
+          <div class="listo__botones">
+            <button type="button" class="boton" (click)="store.reiniciar()">Importar otro archivo</button>
+            <button type="button" class="boton boton--primario" (click)="verRol()">
+              Ver el rol de {{ store.mes.nombre() }}
+              <app-icono nombre="ArrowRight" [tamano]="18" />
+            </button>
+          </div>
+        </section>
+      }
+    }
+
+    @default {
+      @if (store.analisis(); as analisis) {
+        <section class="ajustes tarjeta">
+          <div class="ajustes__archivo">
+            <app-icono nombre="FileSpreadsheet" [tamano]="22" />
+            <span>{{ store.archivo() }}</span>
+            <button type="button" class="boton boton--plano" (click)="store.reiniciar()" [disabled]="paso === 'guardando'">
+              Cambiar archivo
+            </button>
+          </div>
+          <div class="ajustes__fila">
+            <span class="ajustes__etiqueta">Mes que se importa</span>
+            <app-selector-mes />
+          </div>
+          <label class="interruptor">
+            <input type="checkbox" role="switch" [checked]="store.reemplazar()" (change)="store.reemplazar.set($any($event.target).checked)" />
+            <span class="interruptor__pista" aria-hidden="true"></span>
+            Lo que está vacío en el Excel también queda vacío en el sistema
+          </label>
+          @if (!store.reemplazar()) {
+            <p class="ajustes__nota">Solo se agregan las marcas del Excel; lo que ya estaba marcado en el sistema se conserva.</p>
+          }
+        </section>
+
+        @if (analisis.avisos.length) {
+          <div class="advertencia" role="alert">
+            <span class="advertencia__icono"><app-icono nombre="TriangleAlert" [tamano]="20" /></span>
+            <ul>
+              @for (a of analisis.avisos; track a) {
+                <li>{{ a }}</li>
+              }
+            </ul>
+          </div>
+        }
+
+        <h2 class="seccion">
+          Se encontraron {{ analisis.bloques.length }} {{ analisis.bloques.length === 1 ? 'tabla' : 'tablas' }}
+        </h2>
+
+        <div class="bloques">
+          @for (b of analisis.bloques; track b.id; let i = $index) {
+            @let eleccion = store.elecciones().get(b.id);
+            <details
+              class="bloque tarjeta aparecer"
+              [style.--i]="i"
+              [open]="abierta(b)"
+              [class.bloque--fuera]="!eleccion?.incluir"
+              [class.bloque--error]="eleccion?.incluir && (!eleccion?.sedeId || store.sedesRepetidas().has(eleccion!.sedeId!))"
+            >
+              <summary class="bloque__cabecera">
+                <label class="bloque__incluir" (click)="$event.stopPropagation()">
+                  <input
+                    type="checkbox"
+                    [checked]="eleccion?.incluir"
+                    (change)="store.elegir(b.id, { incluir: $any($event.target).checked })"
+                    [attr.aria-label]="'Importar la tabla ' + b.titulo"
+                  />
+                </label>
+                <div class="bloque__titulo">
+                  <strong>{{ b.titulo || 'Tabla sin título' }}</strong>
+                  <small>
+                    Hoja «{{ b.hoja }}» · {{ b.filas.length }} {{ b.filas.length === 1 ? 'agente' : 'agentes' }} ·
+                    {{ store.marcasDe(b) }} marcas
+                  </small>
+                </div>
+                <span class="bloque__flecha" aria-hidden="true"><app-icono nombre="ChevronRight" [tamano]="18" /></span>
+              </summary>
+
+              <div class="bloque__cuerpo">
+                <label class="bloque__sede">
+                  <span>Va a la sede</span>
+                  <select
+                    class="entrada"
+                    [value]="eleccion?.sedeId ?? ''"
+                    (change)="store.elegir(b.id, { sedeId: +$any($event.target).value || null })"
+                  >
+                    <option value="" [selected]="!eleccion?.sedeId">Elija una sede…</option>
+                    @for (s of store.sedes(); track s.id) {
+                      <option [value]="s.id" [selected]="s.id === eleccion?.sedeId">{{ s.nombre }}</option>
+                    }
+                  </select>
+                </label>
+                @if (eleccion?.incluir && eleccion?.sedeId && store.sedesRepetidas().has(eleccion!.sedeId!)) {
+                  <p class="bloque__error" role="alert">Otra tabla ya va a esta sede.</p>
+                }
+                @for (a of b.avisos; track a) {
+                  <p class="bloque__aviso">{{ a }}</p>
+                }
+
+                <ul class="filas">
+                  @for (f of b.filas; track $index) {
+                    <li class="fila">
+                      <div class="fila__agente">
+                        <strong>{{ f.nombres }}</strong>
+                        <span class="fila__cargo">{{ etiquetaCargo[f.cargo] }}</span>
+                        @if (f.agenteId === null) {
+                          <span class="etiqueta etiqueta--nuevo">Nuevo</span>
+                        } @else if (f.reactivar) {
+                          <span class="etiqueta etiqueta--reactivar">Se reactivará</span>
+                        } @else {
+                          <span class="etiqueta">Ya registrado</span>
+                        }
+                      </div>
+                      <div class="tira" [attr.aria-label]="'Marcas de ' + f.nombres">
+                        @for (m of f.marcas; track $index; let d = $index) {
+                          @if (m) {
+                            @let c = catalogo.porCodigo().get(m);
+                            <span
+                              class="tira__dia"
+                              [class.tira__dia--clara]="esClaro(m)"
+                              [style.background]="c?.colorFondo"
+                              [style.color]="c?.colorTexto"
+                              [title]="'Día ' + (d + 1) + ': ' + (c?.nombre ?? m)"
+                              >{{ m }}</span
+                            >
+                          } @else {
+                            <span class="tira__dia tira__dia--vacia" [title]="'Día ' + (d + 1) + ': vacío'"></span>
+                          }
+                        }
+                      </div>
+                      @for (a of f.avisos; track a) {
+                        <p class="fila__aviso">{{ a }}</p>
+                      }
+                    </li>
+                  }
+                </ul>
+              </div>
+            </details>
+          }
+        </div>
+
+        <div class="confirmar">
+          <p class="confirmar__texto">
+            @if (store.impedimento(); as motivo) {
+              {{ motivo }}
+            } @else {
+              Se importarán <strong>{{ store.cuenta().tablas }}</strong>
+              {{ store.cuenta().tablas === 1 ? 'tabla' : 'tablas' }} con
+              <strong>{{ store.cuenta().agentes }}</strong> filas a {{ store.mes.nombre() }}
+              @if (store.cuenta().nuevos) {
+                ({{ store.cuenta().nuevos }} {{ store.cuenta().nuevos === 1 ? 'agente nuevo' : 'agentes nuevos' }})
+              }
+            }
+          </p>
+          <button
+            type="button"
+            class="boton boton--primario"
+            (click)="store.importar()"
+            [disabled]="!!store.impedimento() || paso === 'guardando'"
+          >
+            @if (paso === 'guardando') {
+              <app-icono class="girando" nombre="LoaderCircle" [tamano]="18" />
+              Guardando…
+            } @else {
+              Importar a {{ store.mes.nombre() }}
+            }
+          </button>
+        </div>
+      }
+    }
+  }
+</div>

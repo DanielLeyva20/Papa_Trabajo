@@ -1,4 +1,5 @@
 import { sql } from '../../database/client.js';
+import { CARGO_SQL, columnasCargo } from '../../database/fragmentos.js';
 import type { Cargo } from '../../shared/domain.js';
 
 export interface Agente {
@@ -28,7 +29,7 @@ interface AgenteRow extends Omit<Agente, 'activo'> {
   sedes: string | null;
 }
 
-const COLUMNAS = 'a.id, a.nombres, a.cargo, a.dni, a.telefono, a.activo, f.actualizado_en AS fotoVersion';
+const COLUMNAS = `a.id, a.nombres, ${CARGO_SQL} AS cargo, a.dni, a.telefono, a.activo, f.actualizado_en AS fotoVersion`;
 const toAgente = ({ activo, ...resto }: Omit<AgenteRow, 'sedes'>): Agente => ({ ...resto, activo: activo === 1 });
 
 export const agentesRepository = {
@@ -68,17 +69,19 @@ export const agentesRepository = {
   },
 
   async crear(datos: AgenteDatos): Promise<number> {
+    const { base, descansero } = columnasCargo(datos.cargo);
     const { lastId } = await sql.run(
-      'INSERT INTO agentes (nombres, cargo, dni, telefono) VALUES (?, ?, ?, ?)',
-      datos.nombres, datos.cargo, datos.dni, datos.telefono,
+      'INSERT INTO agentes (nombres, cargo, descansero, dni, telefono) VALUES (?, ?, ?, ?, ?)',
+      datos.nombres, base, descansero, datos.dni, datos.telefono,
     );
     return lastId;
   },
 
   async actualizar(id: number, datos: AgenteDatos): Promise<void> {
+    const { base, descansero } = columnasCargo(datos.cargo);
     await sql.run(
-      'UPDATE agentes SET nombres = ?, cargo = ?, dni = ?, telefono = ? WHERE id = ?',
-      datos.nombres, datos.cargo, datos.dni, datos.telefono, id,
+      'UPDATE agentes SET nombres = ?, cargo = ?, descansero = ?, dni = ?, telefono = ? WHERE id = ?',
+      datos.nombres, base, descansero, datos.dni, datos.telefono, id,
     );
   },
 

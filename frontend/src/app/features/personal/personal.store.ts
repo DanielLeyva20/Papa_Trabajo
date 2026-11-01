@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
 import { AgentesApi, AsignacionesApi, SedesApi, type AgenteDatos } from '../../core/api/api';
-import type { Agente, Asignacion, Cargo, PatronSemanal, Sede } from '../../core/models/dominio';
+import { esDescansero, type Agente, type Asignacion, type Cargo, type PatronSemanal, type Sede } from '../../core/models/dominio';
 import { Avisos } from '../../core/services/avisos';
 import { IndicadorGuardado } from '../../core/services/estado-guardado';
 import { prepararFoto } from '../../core/services/imagen';
@@ -9,7 +9,8 @@ import { MesSeleccionado } from '../../core/services/mes-seleccionado';
 
 /** Semana inicial al asignar un agente a una sede. */
 export function patronInicial(cargo: Cargo): PatronSemanal {
-  if (cargo === 'FEMINA_DESC') return [null, null, null, null, null, null, null];
+  // Los descanseros solo cubren días sueltos: su semana se arma tocando los días que cubren.
+  if (esDescansero(cargo)) return [null, null, null, null, null, null, null];
   return ['D', 'D', 'D', 'D', 'D', 'D', 'L'];
 }
 

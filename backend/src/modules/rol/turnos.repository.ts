@@ -1,4 +1,5 @@
 import { sentencia, sql } from '../../database/client.js';
+import { CARGO_SQL } from '../../database/fragmentos.js';
 import type { Cargo } from '../../shared/domain.js';
 
 export interface Turno {
@@ -35,7 +36,7 @@ export const turnosRepository = {
   /** Pares agente/sede con marcas en el rango pero sin asignación vigente en `mes`. */
   sinAsignacion(desde: string, hasta: string, mes: string): Promise<TurnoHuerfano[]> {
     return sql.all<TurnoHuerfano>(
-      `SELECT DISTINCT t.agente_id AS agenteId, t.sede_id AS sedeId, a.nombres, a.cargo
+      `SELECT DISTINCT t.agente_id AS agenteId, t.sede_id AS sedeId, a.nombres, ${CARGO_SQL} AS cargo
        FROM turnos t JOIN agentes a ON a.id = t.agente_id
        WHERE t.fecha BETWEEN ? AND ?
          AND NOT EXISTS (

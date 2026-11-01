@@ -69,7 +69,7 @@ export class IngresoPage {
     try {
       await this.sesion.ingresar(this.digitos().join(''));
       this.estado.set('correcto');
-      setTimeout(() => void this.router.navigateByUrl(this.destino()), 650);
+      setTimeout(() => void this.entrar(), 450);
     } catch (error) {
       this.digitos.set([]);
       const http = error instanceof HttpErrorResponse ? error : null;
@@ -82,6 +82,23 @@ export class IngresoPage {
     } finally {
       clearTimeout(aviso);
       this.despertando.set(false);
+    }
+  }
+
+  /**
+   * Entra al sistema. Si la navegación interna no avanza (p. ej. se publicó una versión nueva
+   * mientras esta pantalla estaba abierta), se entra recargando la página: la sesión ya está guardada.
+   */
+  private async entrar(): Promise<void> {
+    const destino = this.destino();
+    const respaldo = setTimeout(() => window.location.assign(destino), 6000);
+    try {
+      const ok = await this.router.navigateByUrl(destino, { replaceUrl: true });
+      if (!ok) window.location.assign(destino);
+    } catch {
+      window.location.assign(destino);
+    } finally {
+      clearTimeout(respaldo);
     }
   }
 

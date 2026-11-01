@@ -1,5 +1,6 @@
 import type { Cargo, PatronSemanal } from '../shared/domain.js';
 import { sentencia, sql } from './client.js';
+import { columnasCargo } from './fragmentos.js';
 
 /**
  * Datos iniciales tomados del ROL DF de noviembre 2026 (Cañete).
@@ -168,7 +169,10 @@ export async function seedIfEmpty(desdeMes: string): Promise<void> {
       if (agenteId === undefined) {
         agenteId = agenteIds.size + 1;
         agenteIds.set(nombres, agenteId);
-        lote.push(sentencia('INSERT INTO agentes (id, nombres, cargo) VALUES (?, ?, ?)', agenteId, nombres, cargo));
+        const { base, descansero } = columnasCargo(cargo);
+        lote.push(
+          sentencia('INSERT INTO agentes (id, nombres, cargo, descansero) VALUES (?, ?, ?, ?)', agenteId, nombres, base, descansero),
+        );
       }
       lote.push(
         sentencia(

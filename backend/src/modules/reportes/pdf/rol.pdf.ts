@@ -1,7 +1,7 @@
 import PDFDocument from 'pdfkit';
-import { CARGO_ETIQUETA, type Cargo } from '../../shared/domain.js';
-import type { Distribucion, SedeRol } from '../rol/rol.types.js';
-import type { ReporteDatos } from './reporte.types.js';
+import { CARGO_ETIQUETA, type CargoBase } from '../../../shared/domain.js';
+import type { Distribucion, SedeRol } from '../../rol/rol.types.js';
+import type { ReporteDatos } from '../reportes.types.js';
 
 type Doc = PDFKit.PDFDocument;
 
@@ -148,7 +148,7 @@ function tablaSede(doc: Doc, datos: ReporteDatos, sede: SedeRol) {
   doc.y = y + 10;
 }
 
-const CARGOS_CUADRO: Cargo[] = ['ARMADO', 'SIMPLE', 'FEMINA', 'SUPERVISOR'];
+const CARGOS_CUADRO: CargoBase[] = ['ARMADO', 'SIMPLE', 'FEMINA', 'SUPERVISOR'];
 
 function paginaDistribucion(doc: Doc, datos: ReporteDatos) {
   const bloques: [string, Distribucion][] = [

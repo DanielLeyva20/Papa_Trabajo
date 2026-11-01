@@ -67,8 +67,12 @@
     <label class="campo">
       <span>Cargo</span>
       <select class="entrada" [value]="form().cargo" (change)="editar('cargo', $any($event.target).value)">
-        @for (cargo of cargos; track cargo) {
-          <option [value]="cargo" [selected]="cargo === form().cargo">{{ etiquetaCargo[cargo] }}</option>
+        @for (grupo of gruposCargo; track grupo.titulo) {
+          <optgroup [label]="grupo.titulo">
+            @for (cargo of grupo.cargos; track cargo) {
+              <option [value]="cargo" [selected]="cargo === form().cargo">{{ etiquetaCargo[cargo] }}</option>
+            }
+          </optgroup>
         }
       </select>
     </label>

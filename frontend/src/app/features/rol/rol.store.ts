@@ -1,6 +1,15 @@
 import { DestroyRef, Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
 import { RolApi } from '../../core/api/api';
-import type { CambioMarca, RolMensual, SedeRol } from '../../core/models/dominio';
+import type {
+  CambioMarca,
+  CategoriaCodigo,
+  DiaDelMes,
+  FilaRol,
+  RolMensual,
+  SedeRol,
+  Turno,
+  VistaTurno,
+} from '../../core/models/dominio';
 import { Avisos } from '../../core/services/avisos';
 import { Catalogo } from '../../core/services/catalogo';
 import { IndicadorGuardado } from '../../core/services/estado-guardado';
@@ -26,6 +35,59 @@ export type MapaConflictos = Map<string, string[]>;
 const ESPERA_GUARDADO_MS = 500;
 const MAX_HISTORIAL = 50;
 const CLAVE_SEDE = 'rol-turnos:sede';
+const CLAVE_VISTA = 'rol-turnos:vista';
+const VISTAS: readonly VistaTurno[] = ['juntos', 'separados', 'dia', 'noche'];
+
+/** Un cuadro de la pantalla: una sede entera, o solo su turno de día o de noche. */
+export interface BloqueRol {
+  clave: string;
+  sede: SedeRol;
+  /** null = día y noche en el mismo cuadro. */
+  turno: Turno | null;
+  totales: TotalesSede;
+}
+
+/** Cuenta cuántos hay de día y de noche cada día, y qué días ya están completos. */
+export function calcularTotales(filas: FilaRol[], dias: DiaDelMes[], categorias: Map<string, CategoriaCodigo>): TotalesSede {
+  const dia = dias.map(() => 0);
+  const noche = dias.map(() => 0);
+  let conNoche = false;
+  for (const fila of filas) {
+    if (fila.turno === 'NOCHE' || fila.patron?.some((c) => c && categorias.get(c) === 'NOCHE')) conNoche = true;
+    fila.marcas.forEach((codigo, i) => {
+      const categoria = codigo ? categorias.get(codigo) : undefined;
+      if (categoria === 'DIA') dia[i]!++;
+      if (categoria === 'NOCHE') {
+        noche[i]!++;
+        conNoche = true;
+      }
+    });
+  }
+  // Un día solo se juzga cuando está completo: así no se pinta de rojo lo que aún no se llenó.
+  const completos = dias.map((d, i) => {
+    const esperados = filas.filter((f) => f.patron?.[d.indiceSemana]);
+    return esperados.length > 0 && esperados.every((f) => f.marcas[i] !== null);
+  });
+  return { dia, noche, conNoche, completos };
+}
+
+function guardar(clave: string, valor: string): void {
+  try {
+    sessionStorage.setItem(clave, valor);
+  } catch {
+    /* sin almacenamiento */
+  }
+}
+
+function leerVista(): VistaTurno {
+  try {
+    const guardada = sessionStorage.getItem(CLAVE_VISTA) as VistaTurno | null;
+    if (guardada && VISTAS.includes(guardada)) return guardada;
+  } catch {
+    /* sin almacenamiento */
+  }
+  return 'juntos';
+}
 
 const claveCambio = (c: CambioMarca) => `${c.agenteId}:${c.sedeId}:${c.fecha}`;
 
@@ -45,6 +107,7 @@ export class RolStore {
   readonly cargando = signal(true);
   readonly fallo = signal(false);
   readonly sedeActiva = signal<number | 'todas'>(this.leerSede());
+  readonly vista = signal<VistaTurno>(leerVista());
   /** Marca que se aplica al hacer clic; null = borrador. */
   readonly sello = signal<string | null>('D');
 
@@ -65,32 +128,49 @@ export class RolStore {
 
   readonly totales = computed(() => {
     const rol = this.rol();
-    const categorias = this.catalogo.categorias();
     const mapa = new Map<number, TotalesSede>();
     if (!rol) return mapa;
-    for (const sede of rol.sedes) {
-      const dia = rol.dias.map(() => 0);
-      const noche = rol.dias.map(() => 0);
-      let conNoche = false;
-      for (const fila of sede.filas) {
-        if (fila.patron?.some((c) => c && categorias.get(c) === 'NOCHE')) conNoche = true;
-        fila.marcas.forEach((codigo, i) => {
-          const categoria = codigo ? categorias.get(codigo) : undefined;
-          if (categoria === 'DIA') dia[i]!++;
-          if (categoria === 'NOCHE') {
-            noche[i]!++;
-            conNoche = true;
-          }
-        });
-      }
-      // Un día solo se juzga cuando está completo: así no se pinta de rojo lo que aún no se llenó.
-      const completos = rol.dias.map((d, i) => {
-        const esperados = sede.filas.filter((f) => f.patron?.[d.indiceSemana]);
-        return esperados.length > 0 && esperados.every((f) => f.marcas[i] !== null);
-      });
-      mapa.set(sede.id, { dia, noche, conNoche, completos });
-    }
+    for (const sede of rol.sedes) mapa.set(sede.id, calcularTotales(sede.filas, rol.dias, this.catalogo.categorias()));
     return mapa;
+  });
+
+  /** Cuadros que se ven, según la sede elegida y la vista de turnos (juntos, separados, solo día o solo noche). */
+  readonly bloques = computed<BloqueRol[]>(() => {
+    const rol = this.rol();
+    if (!rol) return [];
+    const vista = this.vista();
+    const categorias = this.catalogo.categorias();
+    const bloque = (sede: SedeRol, turno: Turno | null, filas = sede.filas): BloqueRol => ({
+      clave: `${sede.id}:${turno ?? 'todos'}`,
+      sede: filas === sede.filas ? sede : { ...sede, filas },
+      turno,
+      totales: turno === null ? this.totales().get(sede.id)! : calcularTotales(filas, rol.dias, categorias),
+    });
+    return this.sedesVisibles().flatMap((sede) => {
+      const deDia = sede.filas.filter((f) => f.turno === 'DIA');
+      const deNoche = sede.filas.filter((f) => f.turno === 'NOCHE');
+      switch (vista) {
+        case 'juntos':
+          return [bloque(sede, null, deNoche.length && deDia.length ? [...deDia, ...deNoche] : sede.filas)];
+        case 'separados':
+          // Una sede sin agentes igual muestra su cuadro (con el aviso para agregarlos).
+          return [
+            ...(deDia.length || !deNoche.length ? [bloque(sede, 'DIA', deDia)] : []),
+            ...(deNoche.length ? [bloque(sede, 'NOCHE', deNoche)] : []),
+          ];
+        case 'dia':
+          return deDia.length ? [bloque(sede, 'DIA', deDia)] : [];
+        case 'noche':
+          return deNoche.length ? [bloque(sede, 'NOCHE', deNoche)] : [];
+      }
+    });
+  });
+
+  /** Cuántos agentes de día y de noche hay en las sedes que se ven. */
+  readonly conteoTurnos = computed(() => {
+    const filas = this.sedesVisibles().flatMap((s) => s.filas);
+    const dia = filas.filter((f) => f.turno === 'DIA').length;
+    return { dia, noche: filas.length - dia };
   });
 
   readonly conflictos = computed<MapaConflictos>(() => {
@@ -183,11 +263,12 @@ export class RolStore {
 
   elegirSede(sede: number | 'todas'): void {
     this.sedeActiva.set(sede);
-    try {
-      sessionStorage.setItem(CLAVE_SEDE, String(sede));
-    } catch {
-      /* sin almacenamiento */
-    }
+    guardar(CLAVE_SEDE, String(sede));
+  }
+
+  elegirVista(vista: VistaTurno): void {
+    this.vista.set(vista);
+    guardar(CLAVE_VISTA, vista);
   }
 
   /** Abre un grupo: todo lo marcado hasta `cerrarGrupo` se deshace de una sola vez (p. ej. un arrastre). */

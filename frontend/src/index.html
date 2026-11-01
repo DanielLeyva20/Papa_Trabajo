@@ -7,8 +7,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f5f7">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <!-- Pantalla de arranque: se ve mientras carga el sistema (o mientras Render despierta). Angular la reemplaza. -->
+  <style>
+    .arranque { position: fixed; inset: 0; display: grid; place-content: center; justify-items: center; gap: 18px;
+      background: #f5f5f7; font: 600 15px/1.4 -apple-system, 'Segoe UI', system-ui, sans-serif; color: #5f5f64; }
+    .arranque img { width: 64px; height: 64px; border-radius: 16px; box-shadow: 0 10px 24px -10px rgb(0 0 0 / .35); }
+    .arranque i { width: 26px; height: 26px; border-radius: 50%; border: 3px solid rgb(0 113 227 / .15);
+      border-top-color: #0071e3; animation: arranque-giro .8s linear infinite; }
+    .arranque small { font-weight: 500; color: #6e6e73; max-width: 30ch; text-align: center; opacity: 0;
+      animation: arranque-aviso .4s ease 5s forwards; }
+    @keyframes arranque-giro { to { transform: rotate(360deg); } }
+    @keyframes arranque-aviso { to { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .arranque i { animation-duration: 2s; } }
+  </style>
 </head>
 <body>
-  <app-root></app-root>
+  <app-root>
+    <div class="arranque" role="status">
+      <img src="favicon.svg" alt="">
+      <span>Rol de Turnos</span>
+      <i aria-hidden="true"></i>
+      <small>Conectando con el servidor… la primera vez del día puede tardar hasta un minuto.</small>
+    </div>
+  </app-root>
 </body>
 </html>

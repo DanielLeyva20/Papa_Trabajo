@@ -8,32 +8,71 @@
       <app-selector-mes />
     </header>
 
+    @if (mes.esActual()) {
+      <div class="periodo">
+        <span class="periodo__etiqueta" id="periodo-etiqueta">Periodo</span>
+        <div class="segmentado" appDeslizante role="group" aria-labelledby="periodo-etiqueta">
+          <span class="segmentado__indicador" aria-hidden="true"></span>
+          <button type="button" class="segmentado__opcion" [attr.aria-pressed]="alcance() === 'hasta-hoy'" (click)="elegirAlcance('hasta-hoy')">
+            Avance hasta hoy
+          </button>
+          <button type="button" class="segmentado__opcion" [attr.aria-pressed]="alcance() === 'completo'" (click)="elegirAlcance('completo')">
+            Mes completo
+          </button>
+        </div>
+      </div>
+    }
+
     <ul class="formatos">
-      @for (formato of formatos; track formato.id) {
-        <li class="formato" [attr.data-formato]="formato.id">
+      @for (r of lista; track r.id) {
+        <li class="formato" [attr.data-reporte]="r.id">
           <span class="formato__icono">
-            <app-icono [nombre]="formato.icono" [tamano]="32" [trazo]="1.75" />
+            <app-icono [nombre]="r.icono" [tamano]="30" [trazo]="1.75" />
           </span>
           <div class="formato__texto">
-            <h2>{{ formato.titulo }} · {{ mes.nombre() }}</h2>
-            <p>{{ formato.descripcion }}</p>
+            <h2>{{ r.titulo }}</h2>
+            <p>{{ r.descripcion }}</p>
+            @if (r.id === 'rol') {
+              <label class="vista">
+                <span>Turnos</span>
+                <select class="entrada vista__select" [value]="vista()" (change)="vista.set($any($event.target).value)">
+                  @for (v of vistas; track v.valor) {
+                    <option [value]="v.valor" [selected]="v.valor === vista()">{{ v.etiqueta }}</option>
+                  }
+                </select>
+              </label>
+            }
           </div>
           <div class="formato__botones">
-            @if (mes.esActual()) {
-              <a class="boton" [href]="url(formato.id, 'hasta-hoy')" download (click)="avisarDescarga()">
-                <app-icono nombre="Download" />
-                Avance hasta hoy
-              </a>
-            }
-            <a class="boton boton--primario" [href]="url(formato.id, 'completo')" download (click)="avisarDescarga()">
-              <app-icono nombre="Download" />
-              Mes completo
+            <a class="boton boton--excel" [href]="url(r.id, 'excel')" download (click)="avisarDescarga()">
+              <app-icono nombre="FileSpreadsheet" />
+              Excel
+            </a>
+            <a class="boton boton--pdf" [href]="url(r.id, 'pdf')" download (click)="avisarDescarga()">
+              <app-icono nombre="FileText" />
+              PDF
             </a>
           </div>
         </li>
       }
     </ul>
+    <p class="nota">
+      Se descarga {{ alcance() === 'hasta-hoy' ? 'lo llenado hasta hoy' : 'el mes completo' }} de {{ mes.nombre() }}.
+      El Excel se puede seguir editando; el PDF está listo para imprimir o enviar por WhatsApp.
+    </p>
   </section>
+
+  <a class="tarjeta importar" routerLink="/importar">
+    <span class="importar__icono"><app-icono nombre="FileUp" [tamano]="28" [trazo]="1.75" /></span>
+    <div>
+      <h2 class="subtitulo">¿Ya tiene el rol en Excel? Súbalo</h2>
+      <p class="texto-secundario">
+        El sistema lee el archivo tal como está: sedes, agentes, cargos y cada marca del mes. Antes de guardar, le
+        muestra lo que encontró para que lo revise.
+      </p>
+    </div>
+    <span class="importar__ir" aria-hidden="true"><app-icono nombre="ArrowRight" [tamano]="20" /></span>
+  </a>
 
   <section class="tarjeta bloque" aria-labelledby="resumen-titulo">
     <h2 id="resumen-titulo" class="subtitulo">Resumen de {{ mes.nombre() }}</h2>
@@ -73,46 +112,51 @@
         </table>
       </div>
 
-      <h3 class="cuadro__titulo">Distribución de agentes – turno diurno</h3>
-      <div class="tabla-marco">
-        <table class="tabla tabla--cuadro">
-          <thead>
-            <tr>
-              <th scope="col" class="num">N.º</th>
-              <th scope="col">Sede / Dependencia</th>
-              @for (cargo of cargosCuadro; track cargo) {
-                <th scope="col" class="num">{{ etiquetaCargo[cargo] }}</th>
-              }
-              <th scope="col" class="num">Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (s of datos.distribucionDia.sedes; track s.sedeId; let i = $index) {
+      @for (d of [datos.distribucionDia, datos.distribucionNoche]; track d.turno) {
+        <h3 class="cuadro__titulo">
+          <app-icono [nombre]="d.turno === 'NOCHE' ? 'Moon' : 'Sun'" [tamano]="18" />
+          Distribución de agentes – turno {{ d.turno === 'NOCHE' ? 'nocturno' : 'diurno' }}
+        </h3>
+        <div class="tabla-marco">
+          <table class="tabla tabla--cuadro">
+            <thead>
               <tr>
-                <td class="num">{{ i + 1 }}</td>
-                <th scope="row">{{ s.nombre }}</th>
+                <th scope="col" class="num">N.º</th>
+                <th scope="col">Sede / Dependencia</th>
                 @for (cargo of cargosCuadro; track cargo) {
-                  <td class="num" [class.cero]="!s.porCargo[cargo]">{{ s.porCargo[cargo] }}</td>
+                  <th scope="col" class="num">{{ etiquetaCargo[cargo] }}</th>
                 }
-                <td class="num total">{{ s.total }}</td>
+                <th scope="col" class="num">Total</th>
               </tr>
-            }
-          </tbody>
-          <tfoot>
-            <tr>
-              <td></td>
-              <th scope="row">Total</th>
-              @for (cargo of cargosCuadro; track cargo) {
-                <td class="num">{{ datos.distribucionDia.totales[cargo] }}</td>
+            </thead>
+            <tbody>
+              @for (s of d.sedes; track s.sedeId; let i = $index) {
+                <tr>
+                  <td class="num">{{ i + 1 }}</td>
+                  <th scope="row">{{ s.nombre }}</th>
+                  @for (cargo of cargosCuadro; track cargo) {
+                    <td class="num" [class.cero]="!s.porCargo[cargo]">{{ s.porCargo[cargo] }}</td>
+                  }
+                  <td class="num total">{{ s.total }}</td>
+                </tr>
               }
-              <td class="num">{{ datos.distribucionDia.totales.total }}</td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td></td>
+                <th scope="row">Total</th>
+                @for (cargo of cargosCuadro; track cargo) {
+                  <td class="num">{{ d.totales[cargo] }}</td>
+                }
+                <td class="num">{{ d.totales.total }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      }
       <p class="nota">
-        Cuenta a los agentes fijos según su semana habitual (pantalla Personal). Las féminas descanseras no se cuentan
-        porque solo cubren días sueltos.
+        Cuenta a los agentes fijos según su semana habitual (pantalla Personal). Los descanseros no se cuentan porque solo
+        cubren días sueltos.
       </p>
     } @else if (resumen.isLoading()) {
       <p class="cargando">Calculando…</p>

@@ -65,12 +65,106 @@
   transition: transform 400ms var(--rebote);
 }
 
-.formato[data-formato='excel'] .formato__icono {
+.formato[data-reporte='rol'] .formato__icono {
+  color: var(--azul);
+}
+
+.formato[data-reporte='general'] .formato__icono {
+  color: var(--indigo);
+}
+
+.formato[data-reporte='ausencias'] .formato__icono {
+  color: #c93400;
+}
+
+// Excel y PDF se distinguen por el color del ícono, no del botón entero
+.boton--excel app-icono {
   color: var(--verde);
 }
 
-.formato[data-formato='pdf'] .formato__icono {
+.boton--pdf app-icono {
   color: var(--rojo);
+}
+
+// ---------- Periodo (solo en el mes en curso) y vista de turnos ----------
+.periodo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-3);
+  padding: var(--e-2) 0 var(--e-3);
+}
+
+.periodo__etiqueta,
+.vista > span {
+  font-size: var(--t-xs);
+  font-weight: 600;
+  color: var(--texto-2);
+}
+
+.vista {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+  margin-top: var(--e-3);
+}
+
+.vista__select {
+  width: auto;
+  min-height: 36px;
+  padding-block: 0;
+}
+
+// ---------- Acceso a Importar ----------
+.importar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--e-5);
+  padding: var(--e-5) var(--e-6);
+  color: inherit;
+  text-decoration: none;
+  transition: transform 300ms var(--resorte), box-shadow 300ms ease;
+
+  p {
+    max-width: 70ch;
+    margin-top: var(--e-1);
+    font-size: var(--t-sm);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--azul);
+    outline-offset: 2px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      transform: translateY(-2px);
+    }
+
+    &:hover .importar__ir {
+      transform: translateX(4px);
+    }
+  }
+
+  &:active {
+    transform: scale(0.99);
+  }
+}
+
+.importar__icono {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--verde-velo);
+  color: var(--verde);
+}
+
+.importar__ir {
+  color: var(--azul);
+  transition: transform 300ms var(--resorte);
 }
 
 .formato__botones {
@@ -170,6 +264,9 @@
 }
 
 .cuadro__titulo {
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
   margin-top: var(--e-7);
   font-size: var(--t-lg);
   font-weight: 700;
@@ -216,7 +313,8 @@
   }
 
   .formato,
-  .respaldo {
+  .respaldo,
+  .importar {
     grid-template-columns: 1fr;
     gap: var(--e-3);
   }

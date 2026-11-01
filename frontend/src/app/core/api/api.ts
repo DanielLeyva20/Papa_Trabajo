@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import type { Observable } from 'rxjs';
 import type {
   Agente,
+  AnalisisImportacion,
   Asignacion,
   CambioMarca,
   Cargo,
@@ -10,10 +11,13 @@ import type {
   Configuracion,
   Feriado,
   PatronSemanal,
+  PlanImportacion,
   InfoRespaldo,
+  ResultadoImportacion,
   ResumenMensual,
   RolMensual,
   Sede,
+  VistaTurno,
 } from '../models/dominio';
 
 const BASE = '/api';
@@ -26,6 +30,9 @@ export interface AgenteDatos {
 }
 
 export type AlcanceReporte = 'completo' | 'hasta-hoy';
+
+/** rol: el documento oficial · general: día y noche con promedios · ausencias: faltas, DM y permisos. */
+export type TipoReporte = 'rol' | 'general' | 'ausencias';
 
 /** Acceso con PIN: la sesión vive en una cookie que el navegador envía sola. */
 @Injectable({ providedIn: 'root' })
@@ -196,8 +203,15 @@ export class ReportesApi {
   private readonly http = inject(HttpClient);
 
   /** URL directa: el navegador descarga el archivo con el nombre que envía el servidor. */
-  url(formato: 'excel' | 'pdf', mes: string, alcance: AlcanceReporte): string {
-    return `${BASE}/reportes/${formato}?mes=${mes}&alcance=${alcance}`;
+  url(
+    reporte: TipoReporte,
+    formato: 'excel' | 'pdf',
+    mes: string,
+    alcance: AlcanceReporte,
+    vista: VistaTurno = 'juntos',
+  ): string {
+    const vistaParam = reporte === 'rol' ? `&vista=${vista}` : '';
+    return `${BASE}/reportes/${reporte}/${formato}?mes=${mes}&alcance=${alcance}${vistaParam}`;
   }
 
   respaldo(): Observable<InfoRespaldo> {
@@ -205,4 +219,20 @@ export class ReportesApi {
   }
 
   readonly urlRespaldo = `${BASE}/respaldo/descargar`;
+}
+
+/** Importar el rol desde un Excel: primero se analiza (vista previa) y luego se aplica lo confirmado. */
+@Injectable({ providedIn: 'root' })
+export class ImportacionApi {
+  private readonly http = inject(HttpClient);
+
+  analizar(archivo: Blob): Observable<AnalisisImportacion> {
+    return this.http.post<AnalisisImportacion>(`${BASE}/importacion/analizar`, archivo, {
+      headers: { 'Content-Type': archivo.type || 'application/octet-stream' },
+    });
+  }
+
+  aplicar(plan: PlanImportacion): Observable<ResultadoImportacion> {
+    return this.http.post<ResultadoImportacion>(`${BASE}/importacion/aplicar`, plan);
+  }
 }

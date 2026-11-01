@@ -31,6 +31,8 @@ const CAMPOS: Record<string, string> = {
   pin: 'PIN',
   entidad: 'Entidad',
   supervisor: 'Supervisor',
+  bloques: 'Importación',
+  cambios: 'Marcas',
 };
 
 export const errorHandler: ErrorRequestHandler = (error, req, res, _next) => {

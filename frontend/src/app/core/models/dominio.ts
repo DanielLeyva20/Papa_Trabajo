@@ -1,16 +1,41 @@
-/** Modelos que reflejan las respuestas de la API local. */
+/** Modelos que reflejan las respuestas de la API. */
 
-export type Cargo = 'SUPERVISOR' | 'ARMADO' | 'SIMPLE' | 'FEMINA' | 'FEMINA_DESC';
+/** Cargo base o base + `_DESC` (descansero: cubre los descansos de otros). */
+export type Cargo =
+  | 'SUPERVISOR'
+  | 'SUPERVISOR_DESC'
+  | 'ARMADO'
+  | 'ARMADO_DESC'
+  | 'SIMPLE'
+  | 'SIMPLE_DESC'
+  | 'FEMINA'
+  | 'FEMINA_DESC';
 
-export const CARGOS: readonly Cargo[] = ['SUPERVISOR', 'ARMADO', 'SIMPLE', 'FEMINA', 'FEMINA_DESC'];
+/** Cargo sin la condición de descansero (lo que cuenta el cuadro de distribución). */
+export type CargoBase = 'SUPERVISOR' | 'ARMADO' | 'SIMPLE' | 'FEMINA';
+
+export const CARGOS_FIJOS: readonly CargoBase[] = ['SUPERVISOR', 'ARMADO', 'SIMPLE', 'FEMINA'];
+export const CARGOS_DESCANSEROS: readonly Cargo[] = ['SUPERVISOR_DESC', 'ARMADO_DESC', 'SIMPLE_DESC', 'FEMINA_DESC'];
+export const CARGOS: readonly Cargo[] = [...CARGOS_FIJOS, ...CARGOS_DESCANSEROS];
 
 export const CARGO_ETIQUETA: Record<Cargo, string> = {
   SUPERVISOR: 'Supervisor',
+  SUPERVISOR_DESC: 'Supervisor descansero',
   ARMADO: 'Armado',
+  ARMADO_DESC: 'Armado descansero',
   SIMPLE: 'Simple',
+  SIMPLE_DESC: 'Simple descansero',
   FEMINA: 'Fémina',
   FEMINA_DESC: 'Fémina descansera',
 };
+
+export const esDescansero = (cargo: Cargo) => cargo.endsWith('_DESC');
+
+/** Turno de un agente: de día (diurno) o de noche (nocturno). */
+export type Turno = 'DIA' | 'NOCHE';
+
+/** Cómo se muestran los turnos en el rol y en las descargas. */
+export type VistaTurno = 'juntos' | 'separados' | 'dia' | 'noche';
 
 export type CategoriaCodigo = 'DIA' | 'NOCHE' | 'LIBRE' | 'AUSENCIA';
 
@@ -85,6 +110,7 @@ export interface FilaRol {
   patron: PatronSemanal | null;
   marcas: (string | null)[];
   fotoVersion: string | null;
+  turno: Turno;
 }
 
 export interface SedeRol {
@@ -121,8 +147,8 @@ export interface ResumenAgente {
 
 export interface Distribucion {
   turno: 'DIA' | 'NOCHE';
-  sedes: { sedeId: number; nombre: string; porCargo: Record<Cargo, number>; total: number }[];
-  totales: Record<Cargo, number> & { total: number };
+  sedes: { sedeId: number; nombre: string; porCargo: Record<CargoBase, number>; total: number }[];
+  totales: Record<CargoBase, number> & { total: number };
 }
 
 export interface ResumenMensual {
@@ -143,3 +169,48 @@ export interface InfoRespaldo {
   descripcion: string;
 }
 
+
+// ---------- Importar desde Excel ----------
+
+export interface FilaPrevia {
+  nombres: string;
+  cargoTexto: string;
+  cargo: Cargo;
+  /** null = agente nuevo (se creará al importar). */
+  agenteId: number | null;
+  /** Existe pero estaba dado de baja: se reactivará. */
+  reactivar: boolean;
+  marcas: (string | null)[];
+  avisos: string[];
+}
+
+export interface BloquePrevio {
+  id: number;
+  hoja: string;
+  titulo: string;
+  /** Sede sugerida por el nombre de la tabla; null si no se reconoció. */
+  sedeId: number | null;
+  mes: string | null;
+  filas: FilaPrevia[];
+  avisos: string[];
+}
+
+export interface AnalisisImportacion {
+  mes: string | null;
+  bloques: BloquePrevio[];
+  avisos: string[];
+}
+
+export interface PlanImportacion {
+  mes: string;
+  reemplazar: boolean;
+  bloques: { sedeId: number; filas: Pick<FilaPrevia, 'nombres' | 'cargo' | 'agenteId' | 'marcas'>[] }[];
+}
+
+export interface ResultadoImportacion {
+  agentesNuevos: number;
+  agentesReactivados: number;
+  asignacionesNuevas: number;
+  marcasGuardadas: number;
+  marcasBorradas: number;
+}

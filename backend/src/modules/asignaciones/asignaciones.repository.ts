@@ -1,4 +1,5 @@
 import { sentencia, sql } from '../../database/client.js';
+import { CARGO_SQL } from '../../database/fragmentos.js';
 import type { Cargo, PatronSemanal } from '../../shared/domain.js';
 
 export interface Asignacion {
@@ -18,7 +19,7 @@ interface AsignacionRow extends Omit<Asignacion, 'patron'> {
 }
 
 const SELECT = `
-  SELECT x.id, x.agente_id AS agenteId, x.sede_id AS sedeId, a.nombres, a.cargo,
+  SELECT x.id, x.agente_id AS agenteId, x.sede_id AS sedeId, a.nombres, ${CARGO_SQL} AS cargo,
          x.orden, x.patron, x.desde, x.hasta
   FROM asignaciones x JOIN agentes a ON a.id = x.agente_id`;
 

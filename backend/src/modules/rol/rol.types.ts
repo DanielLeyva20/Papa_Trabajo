@@ -1,5 +1,5 @@
 import type { DiaDelMes } from '../../shared/calendar.js';
-import type { Cargo, PatronSemanal } from '../../shared/domain.js';
+import type { Cargo, CargoBase, PatronSemanal, Turno } from '../../shared/domain.js';
 
 export interface FilaRol {
   /** null cuando el agente ya no está asignado pero tiene marcas en ese mes (historial). */
@@ -12,6 +12,8 @@ export interface FilaRol {
   marcas: (string | null)[];
   /** Marca de tiempo de la foto (para refrescarla) o null si no tiene. */
   fotoVersion: string | null;
+  /** De día o de noche según su semana habitual (o sus marcas del mes). */
+  turno: Turno;
 }
 
 export interface SedeRol {
@@ -60,12 +62,12 @@ export interface ResumenAgente {
 export interface DistribucionSede {
   sedeId: number;
   nombre: string;
-  porCargo: Record<Cargo, number>;
+  porCargo: Record<CargoBase, number>;
   total: number;
 }
 
 export interface Distribucion {
   turno: 'DIA' | 'NOCHE';
   sedes: DistribucionSede[];
-  totales: Record<Cargo, number> & { total: number };
+  totales: Record<CargoBase, number> & { total: number };
 }

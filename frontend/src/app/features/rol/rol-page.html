@@ -85,6 +85,26 @@
         }
       </div>
     </nav>
+
+    <div class="turnos">
+      <div class="segmentado turnos__control" appDeslizante role="group" aria-label="Cómo ver los turnos">
+        <span class="segmentado__indicador" aria-hidden="true"></span>
+        @for (v of vistas; track v.valor) {
+          <button
+            type="button"
+            class="segmentado__opcion"
+            [attr.aria-pressed]="store.vista() === v.valor"
+            (click)="store.elegirVista(v.valor)"
+          >
+            <app-icono [nombre]="v.icono" [tamano]="15" [trazo]="2.25" />
+            {{ v.etiqueta }}
+            @if (v.valor === 'dia' || v.valor === 'noche') {
+              <span class="turnos__cuenta">{{ v.valor === 'dia' ? store.conteoTurnos().dia : store.conteoTurnos().noche }}</span>
+            }
+          </button>
+        }
+      </div>
+    </div>
   }
 
   @if (store.feriados().length) {
@@ -122,7 +142,13 @@
           vacaciones o cambios de descanso.
         </p>
       </div>
-      <button type="button" class="boton boton--primario" (click)="abrirGenerar()">Llenar mes automático</button>
+      <div class="en-blanco__botones">
+        <a class="boton" routerLink="/importar">
+          <app-icono nombre="FileUp" [tamano]="18" />
+          Subir desde Excel
+        </a>
+        <button type="button" class="boton boton--primario" (click)="abrirGenerar()">Llenar mes automático</button>
+      </div>
     </section>
   }
 
@@ -154,17 +180,26 @@
         [class.hojas--cargando]="store.cargando()"
         [class.hojas--saliendo]="store.cargando() && rol.mes !== mes.mes()"
       >
-        @for (sede of store.sedesVisibles(); track sede.id; let i = $index) {
-          <section class="sede tarjeta aparecer" [style.--i]="i" [attr.aria-labelledby]="'sede-' + sede.id">
+        @for (b of store.bloques(); track b.clave; let i = $index) {
+          <section class="sede tarjeta aparecer" [style.--i]="i" [attr.aria-labelledby]="'sede-' + b.clave">
             <header class="sede__cabecera">
-              <h2 class="sede__nombre" [id]="'sede-' + sede.id">{{ sede.nombre }}</h2>
-              <span class="chip">{{ sede.filas.length }} {{ sede.filas.length === 1 ? 'agente' : 'agentes' }}</span>
+              <h2 class="sede__nombre" [id]="'sede-' + b.clave">
+                {{ b.sede.nombre }}
+                @if (b.turno) {
+                  <span class="sede__turno" [class.sede__turno--noche]="b.turno === 'NOCHE'">
+                    <app-icono [nombre]="b.turno === 'NOCHE' ? 'Moon' : 'Sun'" [tamano]="15" [trazo]="2.25" />
+                    {{ b.turno === 'NOCHE' ? 'Turno noche' : 'Turno día' }}
+                  </span>
+                }
+              </h2>
+              <span class="chip">{{ b.sede.filas.length }} {{ b.sede.filas.length === 1 ? 'agente' : 'agentes' }}</span>
             </header>
             <app-cuadricula-rol
-              [sede]="sede"
+              [sede]="b.sede"
+              [turno]="b.turno"
               [dias]="rol.dias"
               [hoy]="rol.hoy"
-              [totales]="store.totales().get(sede.id)"
+              [totales]="b.totales"
               [conflictos]="store.conflictos()"
               [codigos]="catalogo.porCodigo()"
               [porTecla]="catalogo.porTecla()"
@@ -174,6 +209,15 @@
               (inicioTrazo)="store.abrirGrupo()"
               (finTrazo)="store.cerrarGrupo()"
             />
+          </section>
+        } @empty {
+          <section class="sin-turno tarjeta">
+            <app-icono [nombre]="store.vista() === 'noche' ? 'Moon' : 'Sun'" [tamano]="26" />
+            <p>
+              No hay agentes de {{ store.vista() === 'noche' ? 'noche' : 'día' }}
+              {{ store.sedeActiva() === 'todas' ? 'en ninguna sede' : 'en esta sede' }} este mes.
+            </p>
+            <button type="button" class="boton" (click)="store.elegirVista('juntos')">Ver todos</button>
           </section>
         }
       </div>

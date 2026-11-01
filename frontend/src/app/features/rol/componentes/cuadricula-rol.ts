@@ -8,8 +8,9 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { CARGO_ETIQUETA, type CodigoTurno, type DiaDelMes, type SedeRol } from '../../../core/models/dominio';
+import { CARGO_ETIQUETA, type CodigoTurno, type DiaDelMes, type SedeRol, type Turno } from '../../../core/models/dominio';
 import { Avatar } from '../../../core/ui/avatar';
+import { Icono } from '../../../core/ui/icono';
 import type { Celda, MapaConflictos, TotalesSede } from '../rol.store';
 
 export interface PedidoMarca {
@@ -28,7 +29,7 @@ interface Posicion {
  */
 @Component({
   selector: 'app-cuadricula-rol',
-  imports: [Avatar],
+  imports: [Avatar, Icono],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './cuadricula-rol.html',
   styleUrl: './cuadricula-rol.scss',
@@ -49,6 +50,9 @@ export class CuadriculaRol {
   readonly porTecla = input.required<Map<string, CodigoTurno>>();
   readonly sello = input.required<string | null>();
   readonly oleada = input(false);
+  /** Turno del cuadro: null = día y noche juntos (los totales muestran ambos). */
+  readonly turno = input<Turno | null>(null);
+  readonly mensajeVacio = input('Esta sede todavía no tiene agentes. Agréguelos desde Personal.');
 
   readonly marcar = output<PedidoMarca>();
   readonly inicioTrazo = output<void>();
@@ -63,11 +67,19 @@ export class CuadriculaRol {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private trazo: { codigo: string | null; visitadas: Set<string> } | null = null;
 
+  /** En la vista juntos, la primera fila de noche lleva una línea divisoria. */
+  protected readonly inicioNoche = computed(() => {
+    const filas = this.sede().filas;
+    const i = filas.findIndex((f) => f.turno === 'NOCHE');
+    return this.turno() === null && i > 0 ? i : -1;
+  });
+
   protected readonly indiceHoy = computed(() => this.dias().findIndex((d) => d.fecha === this.hoy()));
 
   /** Día completo y por debajo del mínimo: el único caso que merece rojo. */
   protected falta(dia: number): boolean {
     const t = this.totales();
+    if (this.turno() === 'NOCHE') return false;
     return !!t?.completos[dia] && (t.dia[dia] ?? 0) < this.sede().minimoDia;
   }
 

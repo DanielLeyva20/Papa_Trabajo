@@ -103,6 +103,22 @@
   border-bottom-color: var(--separador-fuerte);
 }
 
+// Turno del agente: sol (día) o luna (noche), junto al cargo
+.agente__turno {
+  margin-right: 3px;
+  vertical-align: -1px;
+  color: #c27c0e; // ámbar oscuro: legible sobre blanco
+}
+
+.agente__turno--noche {
+  color: var(--indigo);
+}
+
+// En la vista juntos, una línea separa a los de día de los de noche
+.fila--inicio-noche > * {
+  border-top: 1.5px solid color-mix(in srgb, var(--indigo) 35%, transparent);
+}
+
 .fila--historial .agente__nombre {
   color: var(--texto-2);
 }

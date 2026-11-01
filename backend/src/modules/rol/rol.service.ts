@@ -1,6 +1,14 @@
 import { sql } from '../../database/client.js';
-import { diasDelMes, hoyEnPeru, nombreMes, parseMes, type DiaDelMes, type Mes } from '../../shared/calendar.js';
-import { CARGOS, esPatronFijo, turnoPredominante, type Cargo, type CategoriaCodigo } from '../../shared/domain.js';
+import { diasDelMes, hoyEnPeru, nombreMes, parseMes, type Mes } from '../../shared/calendar.js';
+import {
+  CARGOS_BASE,
+  cargoBase,
+  esPatronFijo,
+  turnoDeAgente,
+  turnoPredominante,
+  type CargoBase,
+  type CategoriaCodigo,
+} from '../../shared/domain.js';
 import { notFound, solicitudInvalida } from '../../shared/errors.js';
 import { agentesRepository } from '../agentes/agentes.repository.js';
 import { asignacionesRepository } from '../asignaciones/asignaciones.repository.js';
@@ -16,6 +24,7 @@ import type {
   RolMensual,
   SedeRol,
 } from './rol.types.js';
+import { calcularTotales } from './rol.calculos.js';
 import { turnosRepository, type Turno } from './turnos.repository.js';
 
 async function rango(mes: Mes) {
@@ -25,8 +34,8 @@ async function rango(mes: Mes) {
 
 const claveTurno = (agenteId: number, sedeId: number, fecha: string) => `${agenteId}:${sedeId}:${fecha}`;
 
-const cuentaCargos = (): Record<Cargo, number> =>
-  Object.fromEntries(CARGOS.map((c) => [c, 0])) as Record<Cargo, number>;
+const cuentaCargos = (): Record<CargoBase, number> =>
+  Object.fromEntries(CARGOS_BASE.map((c) => [c, 0])) as Record<CargoBase, number>;
 
 /** Comprueba que existan todos los agentes y sedes de un lote de cambios (una consulta por tabla). */
 async function validarReferencias(cambios: CambioMarca[]): Promise<void> {
@@ -76,7 +85,8 @@ export const rolService = {
               fotoVersion: fotos.get(a.agenteId) ?? null,
               patron: a.patron,
               marcas: marcasDe(a.agenteId, sede.id),
-            })),
+            }))
+            .map((f) => ({ ...f, turno: turnoDeAgente(f.patron, f.marcas, categorias) })),
           ...huerfanos
             .filter((h) => h.sedeId === sede.id)
             .map((h) => ({
@@ -87,7 +97,8 @@ export const rolService = {
               fotoVersion: fotos.get(h.agenteId) ?? null,
               patron: null,
               marcas: marcasDe(h.agenteId, sede.id),
-            })),
+            }))
+            .map((f) => ({ ...f, turno: turnoDeAgente(f.patron, f.marcas, categorias) })),
         ];
         return {
           id: sede.id,
@@ -95,11 +106,7 @@ export const rolService = {
           nombreCorto: sede.nombreCorto,
           minimoDia: sede.minimoDia,
           filas,
-          totales: {
-            dia: totalesPorDia(filas, dias.length, categorias, 'DIA'),
-            noche: totalesPorDia(filas, dias.length, categorias, 'NOCHE'),
-            completos: diasCompletos(filas, dias),
-          },
+          totales: calcularTotales(filas, dias, categorias),
         };
       });
 
@@ -194,8 +201,8 @@ export const rolService = {
       for (const fila of sede.filas) {
         if (!fila.patron || !esPatronFijo(fila.patron, categorias)) continue;
         if (turnoPredominante(fila.patron, categorias) !== turno) continue;
-        porCargo[fila.cargo]++;
-        totales[fila.cargo]++;
+        porCargo[cargoBase(fila.cargo)]++;
+        totales[cargoBase(fila.cargo)]++;
       }
       const total = Object.values(porCargo).reduce((a, b) => a + b, 0);
       totales.total += total;
@@ -205,31 +212,6 @@ export const rolService = {
     return { turno, sedes, totales };
   },
 };
-
-/**
- * Un día está completo cuando todos los que deben venir ese día (según su semana habitual)
- * ya tienen marca. Solo entonces tiene sentido avisar que falta personal.
- */
-function diasCompletos(filas: FilaRol[], dias: DiaDelMes[]): boolean[] {
-  return dias.map((dia, i) => {
-    const esperados = filas.filter((f) => f.patron?.[dia.indiceSemana]);
-    return esperados.length > 0 && esperados.every((f) => f.marcas[i] !== null);
-  });
-}
-
-function totalesPorDia(
-  filas: FilaRol[],
-  cantidadDias: number,
-  categorias: Map<string, CategoriaCodigo>,
-  categoria: CategoriaCodigo,
-): number[] {
-  return Array.from({ length: cantidadDias }, (_, i) =>
-    filas.reduce((n, fila) => {
-      const codigo = fila.marcas[i];
-      return codigo && categorias.get(codigo) === categoria ? n + 1 : n;
-    }, 0),
-  );
-}
 
 function detectarConflictos(
   turnos: Turno[],

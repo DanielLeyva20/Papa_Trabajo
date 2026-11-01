@@ -32,7 +32,7 @@
 
     <tbody>
       @for (fila of sede().filas; track fila.agenteId; let f = $index) {
-        <tr [class.fila--historial]="fila.asignacionId === null">
+        <tr [class.fila--historial]="fila.asignacionId === null" [class.fila--inicio-noche]="f === inicioNoche()">
           <th
             scope="row"
             class="agente"
@@ -42,7 +42,15 @@
               <app-avatar [agenteId]="fila.agenteId" [nombres]="fila.nombres" [fotoVersion]="fila.fotoVersion" [tamano]="34" />
               <span class="agente__texto">
                 <span class="agente__nombre">{{ fila.nombres }}</span>
-                <span class="agente__cargo">{{ etiquetaCargo[fila.cargo] }}{{ fila.asignacionId === null ? ' · (antes)' : '' }}</span>
+                <span class="agente__cargo">
+                  <app-icono
+                    class="agente__turno"
+                    [class.agente__turno--noche]="fila.turno === 'NOCHE'"
+                    [nombre]="fila.turno === 'NOCHE' ? 'Moon' : 'Sun'"
+                    [tamano]="12"
+                    [trazo]="2.5"
+                  />
+                  <span class="solo-lectores">{{ fila.turno === 'NOCHE' ? 'Turno noche, ' : 'Turno día, ' }}</span>{{ etiquetaCargo[fila.cargo] }}{{ fila.asignacionId === null ? ' · (antes)' : '' }}</span>
               </span>
             </span>
           </th>
@@ -81,7 +89,7 @@
       } @empty {
         <tr>
           <td class="vacio" [attr.colspan]="dias().length + 1">
-            Esta sede todavía no tiene agentes. Agréguelos desde <strong>Personal</strong>.
+            {{ mensajeVacio() }}
           </td>
         </tr>
       }
@@ -89,6 +97,7 @@
 
     @if (totales(); as t) {
       <tfoot>
+        @if (turno() !== 'NOCHE') {
         <tr class="total">
           <th scope="row" class="agente agente--total">
             Total día
@@ -106,7 +115,8 @@
             </td>
           }
         </tr>
-        @if (t.conNoche) {
+        }
+        @if (turno() === 'NOCHE' || (turno() === null && t.conNoche)) {
           <tr class="total total--noche">
             <th scope="row" class="agente agente--total">Total noche</th>
             @for (n of t.noche; track $index; let d = $index) {

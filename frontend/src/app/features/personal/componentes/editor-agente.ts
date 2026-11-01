@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { CARGOS, CARGO_ETIQUETA, type Asignacion, type Cargo } from '../../../core/models/dominio';
+import { CARGOS_DESCANSEROS, CARGOS_FIJOS, CARGO_ETIQUETA, type Asignacion, type Cargo } from '../../../core/models/dominio';
 import { Confirmacion } from '../../../core/services/confirmacion';
 import { reglas, soloDigitos } from '../../../core/validacion/reglas';
 import { Avatar } from '../../../core/ui/avatar';
@@ -27,7 +27,11 @@ export class EditorAgente {
   protected readonly store = inject(PersonalStore);
   private readonly confirmacion = inject(Confirmacion);
 
-  protected readonly cargos = CARGOS;
+  /** Los descanseros cubren los días libres de los fijos; van aparte para no confundirlos. */
+  protected readonly gruposCargo = [
+    { titulo: 'Fijos', cargos: CARGOS_FIJOS },
+    { titulo: 'Descanseros (cubren días libres)', cargos: CARGOS_DESCANSEROS },
+  ];
   protected readonly etiquetaCargo = CARGO_ETIQUETA;
   protected readonly form = signal<Formulario>({ ...VACIO });
   protected readonly sedeNueva = signal<number | null>(null);

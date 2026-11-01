@@ -40,10 +40,14 @@ export const sql = {
     return { changes: r.rowsAffected, lastId: Number(r.lastInsertRowid ?? 0) };
   },
 
-  /** Ejecuta varias sentencias de forma atómica: o se guardan todas o ninguna. */
-  async lote(sentencias: InStatement[]): Promise<void> {
-    if (sentencias.length === 0) return;
-    await db().batch(sentencias, 'write');
+  /**
+   * Ejecuta varias sentencias de forma atómica: o se guardan todas o ninguna.
+   * Devuelve cuántas filas cambió cada sentencia, en el mismo orden.
+   */
+  async lote(sentencias: InStatement[]): Promise<number[]> {
+    if (sentencias.length === 0) return [];
+    const resultados = await db().batch(sentencias, 'write');
+    return resultados.map((r) => r.rowsAffected);
   },
 
   /** Script con varias sentencias separadas por ";" (solo para migraciones). */

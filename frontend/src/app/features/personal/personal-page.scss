@@ -66,58 +66,6 @@
   }
 }
 
-// Interruptor estilo iOS
-.interruptor {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--e-3);
-  min-height: var(--toque);
-  font-size: var(--t-sm);
-  font-weight: 500;
-  cursor: pointer;
-
-  input {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-  }
-}
-
-.interruptor__pista {
-  position: relative;
-  width: 51px;
-  height: 31px;
-  border-radius: var(--pildora);
-  background: rgb(120 120 128 / 0.16);
-  transition: background-color 250ms ease;
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 27px;
-    height: 27px;
-    border-radius: 50%;
-    background: #fff;
-    box-shadow: 0 3px 8px rgb(0 0 0 / 0.15), 0 3px 1px rgb(0 0 0 / 0.06);
-    transition: transform 320ms var(--resorte);
-  }
-}
-
-.interruptor input:checked + .interruptor__pista {
-  background: #34c759;
-
-  &::after {
-    transform: translateX(20px);
-  }
-}
-
-.interruptor input:focus-visible + .interruptor__pista {
-  outline: 3px solid rgb(0 113 227 / 0.55);
-  outline-offset: 2px;
-}
-
 // ---------- Lista tipo Contactos ----------
 .contactos {
   margin: 0;

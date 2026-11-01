@@ -380,3 +380,74 @@
     padding: var(--e-2);
   }
 }
+
+// ---------- Vista de turnos: juntos, separados, solo día o solo noche ----------
+.turnos {
+  display: flex;
+  overflow-x: auto;
+  padding: 2px;
+  margin: -2px;
+}
+
+.turnos__control {
+  min-width: max-content;
+
+  .segmentado__opcion {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.turnos__cuenta {
+  min-width: 22px;
+  padding: 1px 6px;
+  border-radius: var(--pildora);
+  background: var(--relleno-suave);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.sede__nombre {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-2) var(--e-3);
+}
+
+.sede__turno {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: var(--pildora);
+  background: rgb(255 159 10 / 0.12);
+  color: #a15c00;
+  font-size: var(--t-xs);
+  font-weight: 600;
+}
+
+.sede__turno--noche {
+  background: color-mix(in srgb, var(--indigo) 12%, transparent);
+  color: var(--indigo);
+}
+
+.sin-turno {
+  display: grid;
+  justify-items: center;
+  gap: var(--e-3);
+  padding: var(--e-8) var(--e-6);
+  color: var(--texto-2);
+  text-align: center;
+
+  p {
+    margin: 0;
+  }
+}
+
+.en-blanco__botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e-2);
+}

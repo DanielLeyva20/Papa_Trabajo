@@ -1,8 +1,8 @@
 import ExcelJS, { type Borders, type Cell, type Worksheet } from 'exceljs';
-import { CARGO_ETIQUETA, type Cargo } from '../../shared/domain.js';
-import type { CodigoTurno } from '../codigos/codigos.service.js';
-import type { Distribucion } from '../rol/rol.types.js';
-import type { ReporteDatos } from './reporte.types.js';
+import { CARGO_ETIQUETA, type CargoBase } from '../../../shared/domain.js';
+import type { CodigoTurno } from '../../codigos/codigos.service.js';
+import type { Distribucion } from '../../rol/rol.types.js';
+import type { ReporteDatos } from '../reportes.types.js';
 
 const ROJO = 'FFD70015';
 const TINTA = 'FF141414';
@@ -226,7 +226,7 @@ function contarPorCategoria(marcas: (string | null)[], codigos: CodigoTurno[]): 
   return [cuenta(['DIA', 'NOCHE']), cuenta(['LIBRE']), cuenta(['AUSENCIA'])];
 }
 
-const CARGOS_CUADRO: Cargo[] = ['ARMADO', 'SIMPLE', 'FEMINA', 'SUPERVISOR'];
+const CARGOS_CUADRO: CargoBase[] = ['ARMADO', 'SIMPLE', 'FEMINA', 'SUPERVISOR'];
 
 function hojaDistribucion(hoja: Worksheet, datos: ReporteDatos) {
   hoja.columns = [

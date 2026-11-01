@@ -12,6 +12,7 @@ import { authRouter, requiereSesion } from './modules/auth/auth.routes.js';
 import { codigosRouter } from './modules/codigos/codigos.routes.js';
 import { configuracionRouter } from './modules/configuracion/configuracion.routes.js';
 import { feriadosRouter } from './modules/feriados/feriados.routes.js';
+import { importacionRouter } from './modules/importacion/importacion.routes.js';
 import { reportesRouter } from './modules/reportes/reportes.routes.js';
 import { respaldoRouter } from './modules/respaldo/respaldo.routes.js';
 import { rolRouter } from './modules/rol/rol.routes.js';
@@ -42,7 +43,8 @@ export function createApp() {
     }),
   );
   app.use(compression());
-  app.use(express.json({ limit: '1mb' }));
+  // El plan de importación de un mes entero puede pesar más que un guardado normal.
+  app.use(express.json({ limit: '4mb' }));
 
   const api = Router()
     // Público: Render lo usa para saber si el servicio está vivo.
@@ -62,6 +64,7 @@ export function createApp() {
     .use('/reportes', reportesRouter)
     .use('/feriados', feriadosRouter)
     .use('/respaldo', respaldoRouter)
+    .use('/importacion', importacionRouter)
     .use((_req, res) => {
       res.status(404).json({ mensaje: 'Ruta no encontrada.' });
     });

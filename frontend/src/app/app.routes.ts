@@ -39,6 +39,11 @@ export const routes: Routes = [
         title: 'Descargas · Rol de Turnos',
         loadComponent: () => import('./features/descargas/descargas-page').then((m) => m.DescargasPage),
       },
+      {
+        path: 'importar',
+        title: 'Importar desde Excel · Rol de Turnos',
+        loadComponent: () => import('./features/importar/importar-page').then((m) => m.ImportarPage),
+      },
     ],
   },
   { path: '**', redirectTo: 'rol' },

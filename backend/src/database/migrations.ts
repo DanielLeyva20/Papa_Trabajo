@@ -120,6 +120,18 @@ const MIGRATIONS: readonly Migracion[] = [
       );
     }
   },
+
+  /*
+   * 4 — cargos descanseros para todos los cargos (Simple, Armado, Supervisor, Fémina).
+   * Se guarda como un indicador aparte del cargo base: así no hay que reconstruir la tabla
+   * de agentes (que otras tablas referencian) y el cargo sigue validado por su CHECK.
+   */
+  async () => {
+    await sql.script(`
+      ALTER TABLE agentes ADD COLUMN descansero INTEGER NOT NULL DEFAULT 0;
+      UPDATE agentes SET cargo = 'FEMINA', descansero = 1 WHERE cargo = 'FEMINA_DESC';
+    `);
+  },
 ];
 
 export async function runMigrations(): Promise<void> {
