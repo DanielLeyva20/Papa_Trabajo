@@ -11,3 +11,4 @@ datos/
 
 # Archivos de revisión de diseño (locales)
 .impeccable/review/
+!backend/src/modules/reportes/datos/
