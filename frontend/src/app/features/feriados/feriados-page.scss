@@ -1,0 +1,251 @@
+.pagina {
+  display: grid;
+  gap: var(--e-6);
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--e-4);
+
+  p {
+    max-width: 62ch;
+    margin-top: var(--e-2);
+  }
+}
+
+.anio {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+}
+
+.anio__valor {
+  min-width: 4ch;
+  text-align: center;
+  font-size: var(--t-xl);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  animation: rodar 380ms var(--resorte);
+}
+
+@keyframes rodar {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+    transform: translateY(10px);
+  }
+}
+
+// ---------- Próximo feriado ----------
+.proximo {
+  display: flex;
+  align-items: center;
+  gap: var(--e-5);
+  padding: var(--e-5) var(--e-6);
+  border-radius: var(--radio-xl);
+  background: linear-gradient(135deg, #ff3b47 0%, var(--rojo) 55%, #a8000f 100%);
+  color: #fff;
+  box-shadow: 0 20px 40px -20px rgb(215 0 21 / 0.7);
+  animation: entrar 620ms var(--resorte);
+}
+
+@keyframes entrar {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+}
+
+// Hoja de calendario como el ícono de Calendario
+.proximo__hoja {
+  display: grid;
+  flex: none;
+  width: 92px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #fff;
+  color: var(--texto);
+  text-align: center;
+  box-shadow: 0 10px 24px -10px rgb(0 0 0 / 0.45);
+  transform: rotate(-4deg);
+  transition: transform 500ms var(--rebote);
+
+  .proximo:hover & {
+    transform: rotate(3deg) scale(1.05);
+  }
+}
+
+.proximo__mes {
+  padding: 6px 0 2px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--rojo);
+}
+
+.proximo__dia {
+  padding-bottom: 8px;
+  font-size: 2.75rem;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.proximo__texto h2 {
+  margin: 0 0 4px;
+  font-size: var(--t-xl);
+  font-weight: 700;
+}
+
+.proximo__cuando {
+  opacity: 0.9;
+}
+
+// ---------- Meses ----------
+.meses {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--e-4);
+}
+
+.mes {
+  padding: var(--e-4);
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+}
+
+.mes__nombre {
+  margin: 0 0 var(--e-2) var(--e-1);
+  font-size: var(--t-md);
+  font-weight: 700;
+}
+
+.feriado {
+  display: flex;
+  align-items: center;
+  gap: var(--e-3);
+  min-height: 60px;
+  padding: var(--e-1);
+  border-radius: var(--radio-m);
+  transition: background-color 160ms ease;
+
+  & + & {
+    border-top: 0.5px solid var(--separador);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background: var(--relleno-suave);
+    }
+  }
+}
+
+// Los que ya pasaron se apagan sin perder legibilidad
+.feriado--pasado {
+  .feriado__nombre {
+    color: var(--texto-2);
+    font-weight: 500;
+  }
+
+  .feriado__mes {
+    background: var(--relleno);
+    color: var(--texto-2);
+  }
+
+  .feriado__dia {
+    color: var(--texto-2);
+  }
+}
+
+.feriado__fecha {
+  display: grid;
+  flex: none;
+  width: 46px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--superficie);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.12);
+  text-align: center;
+}
+
+.feriado__mes {
+  padding: 2px 0;
+  background: var(--rojo);
+  color: #fff;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.feriado__dia {
+  padding: 2px 0 4px;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.feriado__texto {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.feriado__nombre {
+  font-weight: 600;
+  font-size: var(--t-sm);
+}
+
+.feriado__detalle {
+  font-size: 0.75rem;
+  color: var(--texto-2);
+}
+
+.quitar {
+  width: 36px;
+  min-height: 36px;
+  background: transparent;
+  color: var(--rojo);
+}
+
+// ---------- Agregar ----------
+.grupo__titulo {
+  margin: 0 0 var(--e-2) var(--e-4);
+  font-size: var(--t-xs);
+  font-weight: 600;
+  color: var(--texto-2);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.grupo__pie {
+  margin: var(--e-2) var(--e-4) 0;
+  font-size: var(--t-xs);
+  color: var(--texto-2);
+}
+
+.agregar {
+  display: grid;
+  grid-template-columns: 200px 1fr auto;
+  align-items: end;
+  gap: var(--e-3);
+  padding: var(--e-4);
+}
+
+@media (max-width: 720px) {
+  .agregar {
+    grid-template-columns: 1fr;
+  }
+
+  .proximo {
+    padding: var(--e-4);
+    gap: var(--e-4);
+  }
+}

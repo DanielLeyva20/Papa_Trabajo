@@ -1,0 +1,44 @@
+<a class="saltar" href="#contenido">Ir al contenido</a>
+
+@if (sesion.estado() === 'activa') {
+<header class="barra">
+  <a class="marca" routerLink="/rol" aria-label="Rol de Turnos, inicio">
+    <img class="marca__icono" src="favicon.svg" alt="" width="34" height="34" />
+    <span class="marca__texto">
+      <span class="marca__nombre">Rol de Turnos</span>
+      <span class="marca__entidad">Distrito Fiscal de Cañete</span>
+    </span>
+  </a>
+
+  <nav class="segmentado nav" aria-label="Secciones" appDeslizante>
+    <span class="segmentado__indicador" aria-hidden="true"></span>
+    @for (enlace of enlaces; track enlace.ruta) {
+      <a
+        class="segmentado__opcion nav__enlace"
+        [routerLink]="enlace.ruta"
+        routerLinkActive
+        ariaCurrentWhenActive="page"
+      >
+        <app-icono [nombre]="enlace.icono" [tamano]="18" />
+        <span>{{ enlace.texto }}</span>
+      </a>
+    }
+  </nav>
+
+  <p class="guardado" [attr.data-estado]="estado()" role="status" aria-live="polite">
+    <span class="guardado__punto" aria-hidden="true"></span>
+    {{ textoEstado() }}
+  </p>
+
+  <button type="button" class="boton boton--icono salir" (click)="salir()" title="Salir del sistema" aria-label="Salir del sistema">
+    <app-icono nombre="LogOut" [tamano]="18" />
+  </button>
+</header>
+}
+
+<main id="contenido" class="contenido">
+  <router-outlet />
+</main>
+
+<app-capa-avisos />
+<app-dialogo-confirmacion />

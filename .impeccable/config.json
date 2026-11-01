@@ -1,0 +1,32 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "frontend/src/app/core/ui/avatar.ts"
+        ],
+        "createdAt": "2026-11-01T16:11:02.817Z",
+        "reason": "assistant: src is a dynamic [src] binding to /api/agentes/:id/foto rendered only when a photo exists, with initials fallback"
+      },
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "frontend/src/app/features/personal/componentes/editor-agente.html"
+        ],
+        "createdAt": "2026-11-01T16:17:20.744Z",
+        "reason": "assistant: preview img binds [src] to a freshly created blob: URL and renders only when a photo was chosen"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "cubic-bezier(0.34, 1.28, 0.64, 1)",
+        "createdAt": "2026-11-01T16:25:15.081Z",
+        "reason": "user asked (2026-11-01) for lively, premium, eye-catching animations; overshoot softened to 1.28 and used only for tap/press feedback"
+      }
+    ]
+  }
+}

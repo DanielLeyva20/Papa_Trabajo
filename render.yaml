@@ -1,0 +1,25 @@
+# Render Blueprint: crea el servicio web del Rol de Turnos.
+# En Render: New → Blueprint → elegir este repositorio.
+services:
+  - type: web
+    name: rol-turnos
+    runtime: node
+    region: virginia          # La más cercana a Perú. Cree la base Turso en AWS us-east-1 (Virginia)
+    plan: free
+    buildCommand: npm run render:build
+    startCommand: npm run render:start
+    healthCheckPath: /api/salud
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 22.13.0
+      - key: SESSION_SECRET
+        generateValue: true   # Render genera una clave segura
+      - key: APP_PIN
+        sync: false           # Se escribe a mano en el panel de Render
+      - key: DATABASE_URL
+        sync: false           # libsql://rol-turnos-<usuario>.turso.io
+      - key: DATABASE_AUTH_TOKEN
+        sync: false           # turso db tokens create rol-turnos

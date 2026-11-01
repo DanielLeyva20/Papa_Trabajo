@@ -1,0 +1,402 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 17px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: var(--f-texto);
+  font-size: var(--t-md);
+  font-optical-sizing: auto;
+  line-height: 1.47;
+  letter-spacing: -0.011em;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  line-height: 1.12;
+  letter-spacing: -0.022em;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+button {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: var(--azul);
+  text-underline-offset: 3px;
+}
+
+::selection {
+  background: rgb(0 113 227 / 0.22);
+}
+
+:focus-visible {
+  outline: 3px solid rgb(0 113 227 / 0.55);
+  outline-offset: 2px;
+}
+
+* {
+  scrollbar-color: rgb(0 0 0 / 0.22) transparent;
+  scrollbar-width: thin;
+}
+
+.solo-lectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+// ---------- Tarjetas ----------
+.tarjeta {
+  background: var(--superficie);
+  border-radius: var(--radio-xl);
+  box-shadow: var(--sombra-1);
+}
+
+.titulo-grande {
+  font-size: var(--t-xxl);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+
+.subtitulo {
+  font-size: var(--t-xl);
+  font-weight: 700;
+  letter-spacing: -0.028em;
+}
+
+.texto-secundario {
+  color: var(--texto-2);
+}
+
+// ---------- Botones (píldoras) ----------
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--e-2);
+  min-height: var(--toque);
+  padding: 0 var(--e-5);
+  border: 0;
+  border-radius: var(--pildora);
+  background: var(--relleno);
+  color: var(--texto);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    transform 160ms var(--ease-out),
+    background-color 200ms ease,
+    color 200ms ease,
+    box-shadow 200ms ease;
+
+  &:active:not(:disabled) {
+    transform: scale(0.96);
+    transition-duration: 80ms;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover:not(:disabled) {
+      background: rgb(118 118 128 / 0.18);
+    }
+  }
+}
+
+.boton--primario {
+  background: var(--azul);
+  color: #fff;
+  box-shadow: 0 4px 14px -4px rgb(0 113 227 / 0.55);
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover:not(:disabled) {
+      background: var(--azul-hondo);
+    }
+  }
+}
+
+.boton--oscuro {
+  background: var(--texto);
+  color: #fff;
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover:not(:disabled) {
+      background: #3a3a3c;
+    }
+  }
+}
+
+.boton--plano {
+  background: transparent;
+  color: var(--azul);
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover:not(:disabled) {
+      background: var(--azul-velo);
+    }
+  }
+}
+
+.boton--peligro {
+  background: var(--rojo-velo);
+  color: var(--rojo);
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover:not(:disabled) {
+      background: rgb(215 0 21 / 0.13);
+    }
+  }
+}
+
+.boton--icono {
+  width: var(--toque);
+  padding: 0;
+}
+
+// ---------- Campos ----------
+.campo {
+  display: grid;
+  gap: 6px;
+
+  > span {
+    padding-left: 4px;
+    font-weight: 600;
+    font-size: var(--t-xs);
+    color: var(--texto-2);
+  }
+
+  small {
+    font-weight: 400;
+    color: var(--texto-3);
+  }
+}
+
+.entrada {
+  width: 100%;
+  min-height: var(--toque);
+  padding: 0 var(--e-4);
+  border: 1px solid var(--separador-fuerte);
+  border-radius: var(--radio-m);
+  background: var(--superficie);
+  transition:
+    border-color 200ms ease,
+    box-shadow 200ms ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--azul);
+    box-shadow: 0 0 0 4px rgb(0 113 227 / 0.16);
+  }
+
+  &::placeholder {
+    color: var(--texto-3);
+  }
+}
+
+// ---------- Control segmentado con indicador deslizante ----------
+.segmentado {
+  position: relative;
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--radio-m);
+  background: var(--relleno);
+  isolation: isolate;
+}
+
+.segmentado__indicador {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 0;
+  z-index: -1;
+  width: var(--ind-w, 0);
+  border-radius: 9px;
+  background: var(--superficie);
+  box-shadow: 0 3px 8px rgb(0 0 0 / 0.12), 0 3px 1px rgb(0 0 0 / 0.04);
+  transform: translateX(var(--ind-x, 0));
+  opacity: var(--ind-o, 0);
+}
+
+[data-deslizante-listo] .segmentado__indicador {
+  transition:
+    transform 420ms var(--resorte),
+    width 420ms var(--resorte);
+}
+
+.segmentado__opcion {
+  position: relative;
+  min-height: 36px;
+  padding: 0 var(--e-4);
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--texto-2);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  transition: color 200ms ease;
+
+  &[aria-current],
+  &[aria-pressed='true'] {
+    color: var(--texto);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover:not([aria-current]) {
+      color: var(--texto);
+    }
+  }
+}
+
+// ---------- Etiquetas ----------
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: var(--pildora);
+  background: var(--relleno-suave);
+  font-size: var(--t-xs);
+  font-weight: 600;
+  color: var(--texto-2);
+  white-space: nowrap;
+}
+
+// ---------- Aparición escalonada (solo en la primera carga de una lista) ----------
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+}
+
+.aparecer {
+  animation: aparecer 520ms var(--resorte) both;
+  animation-delay: calc(var(--i, 0) * 28ms);
+}
+
+// ---------- Transiciones entre pantallas (View Transitions API) ----------
+::view-transition-old(root) {
+  animation: vista-salir 180ms var(--ease-out) both;
+}
+
+::view-transition-new(root) {
+  animation: vista-entrar 360ms var(--resorte) both;
+}
+
+@keyframes vista-salir {
+  to {
+    opacity: 0;
+    filter: blur(4px);
+    transform: scale(0.99);
+  }
+}
+
+@keyframes vista-entrar {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --vidrio: #ffffff;
+  }
+}
+
+// ---------- Errores de validación en formularios ----------
+.campo__error {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-left: 4px;
+  font-size: var(--t-xs);
+  font-weight: 600;
+  color: var(--rojo) !important;
+  animation: aparecer-error 260ms var(--resorte);
+}
+
+.campo--error .entrada {
+  border-color: var(--rojo);
+  background: rgb(215 0 21 / 0.03);
+
+  &:focus {
+    box-shadow: 0 0 0 4px rgb(215 0 21 / 0.14);
+  }
+}
+
+@keyframes aparecer-error {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.girando {
+  animation: girar-global 0.8s linear infinite;
+}
+
+@keyframes girar-global {
+  to {
+    transform: rotate(360deg);
+  }
+}

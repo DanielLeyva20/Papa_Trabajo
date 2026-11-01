@@ -1,0 +1,20 @@
+{
+  "name": "rol-turnos",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Rol de Turnos – Distrito Fiscal de Cañete. Angular + Node/Express + SQLite en la PC local.",
+  "scripts": {
+    "render:build": "npm ci --prefix backend --include=dev && npm ci --prefix frontend --include=dev && npm run build --prefix backend && npm run build --prefix frontend",
+    "render:start": "npm start --prefix backend",
+    "instalar": "npm ci --prefix backend && npm ci --prefix frontend",
+    "compilar": "npm run build --prefix backend && npm run build --prefix frontend",
+    "iniciar": "npm start --prefix backend -- --abrir",
+    "dev": "node scripts/dev.mjs",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm start --prefix frontend",
+    "verificar": "npm run typecheck --prefix backend && npm run build --prefix frontend"
+  },
+  "engines": {
+    "node": ">=22.13"
+  }
+}

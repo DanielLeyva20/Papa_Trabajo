@@ -1,0 +1,191 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+}
+
+.saltar {
+  position: absolute;
+  left: var(--e-4);
+  top: -100px;
+  z-index: 100;
+  padding: var(--e-2) var(--e-4);
+  border-radius: var(--pildora);
+  background: var(--texto);
+  color: #fff;
+
+  &:focus {
+    top: var(--e-2);
+  }
+}
+
+// Barra translúcida: el contenido se desplaza por debajo, como en macOS.
+.barra {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: var(--e-5);
+  min-height: 64px;
+  padding: var(--e-2) var(--e-6);
+  background: var(--vidrio);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 0.5px solid var(--separador);
+  view-transition-name: barra;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: var(--e-3);
+  color: var(--texto);
+  text-decoration: none;
+}
+
+.marca__icono {
+  border-radius: 9px;
+  transition: transform 260ms var(--rebote);
+}
+
+.marca:hover .marca__icono {
+  transform: rotate(-6deg) scale(1.06);
+}
+
+.marca__texto {
+  display: grid;
+  line-height: 1.15;
+}
+
+.marca__nombre {
+  font-weight: 700;
+  font-size: var(--t-md);
+  letter-spacing: -0.02em;
+}
+
+.marca__entidad {
+  font-size: var(--t-xs);
+  color: var(--texto-2);
+}
+
+.nav {
+  margin: 0 auto;
+}
+
+.nav__enlace {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 38px;
+  text-decoration: none;
+
+  app-icono {
+    opacity: 0.75;
+    transition: opacity 200ms ease;
+  }
+
+  &[aria-current] app-icono {
+    opacity: 1;
+    color: var(--azul);
+  }
+}
+
+.guardado {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+  min-width: 132px;
+  justify-content: flex-end;
+  font-size: var(--t-xs);
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--texto-2);
+}
+
+.guardado__punto {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #30d158;
+  box-shadow: 0 0 0 3px rgb(48 209 88 / 0.2);
+  transition: background-color 200ms ease, box-shadow 200ms ease;
+}
+
+.guardado[data-estado='guardando'] .guardado__punto {
+  background: var(--azul);
+  box-shadow: 0 0 0 3px rgb(0 113 227 / 0.2);
+  animation: latir 900ms ease-in-out infinite;
+}
+
+.guardado[data-estado='error'] {
+  color: var(--rojo);
+
+  .guardado__punto {
+    background: var(--rojo);
+    box-shadow: 0 0 0 3px rgb(215 0 21 / 0.18);
+  }
+}
+
+@keyframes latir {
+  50% {
+    transform: scale(0.6);
+    opacity: 0.6;
+  }
+}
+
+.salir {
+  width: 38px;
+  min-height: 38px;
+  background: transparent;
+  color: var(--texto-2);
+}
+
+.contenido {
+  padding: var(--e-6) var(--e-6) calc(var(--e-8) + 80px);
+}
+
+@media (max-width: 1180px) {
+  .barra {
+    flex-wrap: wrap;
+    gap: var(--e-2) var(--e-4);
+    padding: var(--e-2) var(--e-4);
+  }
+
+  .nav {
+    order: 3;
+    max-width: 100%;
+    margin: 0;
+    overflow-x: auto;
+  }
+
+  .guardado {
+    margin-left: auto;
+    min-width: 0;
+  }
+
+  .contenido {
+    padding: var(--e-4) var(--e-4) calc(var(--e-8) + 96px);
+  }
+}
+
+// Celular: ícono con su nombre debajo (como la barra de pestañas del iPhone); nunca íconos sueltos
+@media (max-width: 600px) {
+  .nav {
+    display: flex;
+    width: 100%;
+  }
+
+  .nav__enlace {
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    min-height: 52px;
+    padding: 0 2px;
+    font-size: 0.75rem;
+    letter-spacing: 0;
+  }
+
+  .marca__entidad {
+    display: none;
+  }
+}

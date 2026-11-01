@@ -1,0 +1,13 @@
+node_modules/
+dist/
+datos/
+.angular/
+*.log
+
+# Secretos: nunca subir
+.env
+.env.*
+!.env.example
+
+# Archivos de revisión de diseño (locales)
+.impeccable/review/

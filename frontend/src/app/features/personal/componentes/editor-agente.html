@@ -1,0 +1,188 @@
+<article class="editor" aria-labelledby="editor-titulo">
+  <button type="button" class="boton boton--icono editor__cerrar" (click)="store.seleccionar(null)" aria-label="Cerrar">
+    <app-icono nombre="X" [tamano]="18" [trazo]="2.5" />
+  </button>
+
+  <!-- Foto: clic en la cámara o arrastrar una imagen encima -->
+  <header class="perfil">
+    <div
+      class="perfil__foto"
+      [class.perfil__foto--arrastrando]="arrastrando()"
+      [class.perfil__foto--subiendo]="store.subiendoFoto()"
+      (dragover)="alArrastrar($event, true)"
+      (dragleave)="alArrastrar($event, false)"
+      (drop)="alSoltar($event)"
+    >
+      @if (store.fotoNueva(); as nueva) {
+        <img class="perfil__previa" [src]="nueva.url" alt="Foto elegida" />
+      } @else {
+        <app-avatar
+          [agenteId]="agente()?.id ?? 0"
+          [nombres]="form().nombres || 'Nuevo agente'"
+          [fotoVersion]="agente()?.fotoVersion ?? null"
+          [tamano]="112"
+        />
+      }
+      <button type="button" class="perfil__camara" (click)="archivo.click()" aria-label="Elegir foto">
+        <app-icono nombre="Camera" [tamano]="18" [trazo]="2.25" />
+      </button>
+      <input #archivo type="file" accept="image/*" hidden (change)="alElegir($event)" />
+    </div>
+
+    <h2 id="editor-titulo" class="perfil__nombre">{{ esNuevo() ? 'Nuevo agente' : agente()?.nombres }}</h2>
+    @if (agente(); as a) {
+      <p class="perfil__cargo">{{ etiquetaCargo[a.cargo] }}</p>
+    }
+    <div class="perfil__acciones">
+      <button type="button" class="boton boton--plano" (click)="archivo.click()" [disabled]="store.subiendoFoto()">
+        <app-icono nombre="ImageUp" [tamano]="18" />
+        {{ tieneFoto() ? 'Cambiar foto' : 'Subir foto' }}
+      </button>
+      @if (tieneFoto()) {
+        <button type="button" class="boton boton--plano boton--quitar" (click)="store.quitarFoto()">Quitar</button>
+      }
+    </div>
+    <p class="perfil__pista">También puede arrastrar una foto sobre el círculo.</p>
+  </header>
+
+  <form class="grupo datos" (submit)="guardar($event)" novalidate>
+    <label class="campo campo--ancho" [class.campo--error]="error('nombres')">
+      <span>Apellidos y nombres</span>
+      <input
+        class="entrada"
+        [value]="form().nombres"
+        (input)="editar('nombres', $any($event.target).value)"
+        (blur)="tocar('nombres')"
+        autocomplete="off"
+        maxlength="80"
+        placeholder="Ej.: QUISPE RAMOS JUAN"
+        [attr.aria-invalid]="!!error('nombres')"
+        aria-describedby="error-nombres"
+        required
+      />
+      @if (error('nombres'); as e) {
+        <small class="campo__error" id="error-nombres" role="alert">{{ e }}</small>
+      }
+    </label>
+    <label class="campo">
+      <span>Cargo</span>
+      <select class="entrada" [value]="form().cargo" (change)="editar('cargo', $any($event.target).value)">
+        @for (cargo of cargos; track cargo) {
+          <option [value]="cargo" [selected]="cargo === form().cargo">{{ etiquetaCargo[cargo] }}</option>
+        }
+      </select>
+    </label>
+    <label class="campo" [class.campo--error]="error('dni')">
+      <span>DNI <small>(opcional, 8 dígitos)</small></span>
+      <input
+        class="entrada"
+        inputmode="numeric"
+        maxlength="8"
+        [value]="form().dni"
+        (input)="editar('dni', $any($event.target).value); $any($event.target).value = form().dni"
+        (blur)="tocar('dni')"
+        [attr.aria-invalid]="!!error('dni')"
+        aria-describedby="error-dni"
+      />
+      @if (error('dni'); as e) {
+        <small class="campo__error" id="error-dni" role="alert">{{ e }}</small>
+      }
+    </label>
+    <label class="campo" [class.campo--error]="error('telefono')">
+      <span>Teléfono <small>(opcional)</small></span>
+      <input
+        class="entrada"
+        inputmode="tel"
+        maxlength="9"
+        [value]="form().telefono"
+        (input)="editar('telefono', $any($event.target).value); $any($event.target).value = form().telefono"
+        (blur)="tocar('telefono')"
+        [attr.aria-invalid]="!!error('telefono')"
+        aria-describedby="error-telefono"
+      />
+      @if (error('telefono'); as e) {
+        <small class="campo__error" id="error-telefono" role="alert">{{ e }}</small>
+      }
+    </label>
+    <div class="datos__acciones">
+      <button type="submit" class="boton boton--primario" [disabled]="store.guardando()">
+        @if (store.guardando()) {
+          <app-icono nombre="LoaderCircle" [tamano]="18" class="girando" />
+          Guardando…
+        } @else {
+          <app-icono nombre="Check" [tamano]="18" [trazo]="2.5" />
+          {{ esNuevo() ? 'Agregar agente' : 'Guardar datos' }}
+        }
+      </button>
+    </div>
+  </form>
+
+  @if (agente(); as agente) {
+    <section class="sedes" aria-labelledby="sedes-titulo">
+      <div>
+        <h3 id="sedes-titulo">Sedes y semana habitual</h3>
+        <p class="nota">
+          Toque cada día para cambiarlo: <strong>D</strong> día → <strong>N</strong> noche → <strong>L</strong> libre →
+          <strong>–</strong> no viene. «Llenar mes automático» usa esta semana. Rige desde
+          <strong>{{ store.mes.nombre() }}</strong>.
+        </p>
+      </div>
+
+      @for (asignacion of store.asignaciones(); track asignacion.id; let i = $index) {
+        <div class="grupo asignacion aparecer" [style.--i]="i">
+          <div class="asignacion__cabecera">
+            <h4>{{ nombreSede(asignacion.sedeId) }}</h4>
+            <button type="button" class="boton boton--plano boton--quitar" (click)="retirar(asignacion)">
+              Quitar de esta sede
+            </button>
+          </div>
+          <app-editor-patron
+            [patron]="asignacion.patron"
+            [sede]="nombreSede(asignacion.sedeId)"
+            (cambio)="store.cambiarPatron(asignacion.id, $event)"
+          />
+        </div>
+      } @empty {
+        <p class="sin-sedes">
+          @if (agente.activo) {
+            Todavía no está en ninguna sede este mes. Agréguelo abajo para que aparezca en el rol.
+          } @else {
+            Este agente está dado de baja.
+          }
+        </p>
+      }
+
+      @if (agente.activo && store.sedesDisponibles().length) {
+        <div class="agregar">
+          <label class="campo">
+            <span>Agregar a otra sede</span>
+            <select class="entrada" (change)="sedeNueva.set(+$any($event.target).value || null)">
+              <option value="" [selected]="sedeNueva() === null">Elija una sede…</option>
+              @for (sede of store.sedesDisponibles(); track sede.id) {
+                <option [value]="sede.id">{{ sede.nombre }}</option>
+              }
+            </select>
+          </label>
+          <button type="button" class="boton" [disabled]="!sedeNueva()" (click)="asignar()">
+            <app-icono nombre="Plus" [tamano]="18" />
+            Agregar
+          </button>
+        </div>
+      }
+    </section>
+
+    <footer class="editor__pie">
+      @if (agente.activo) {
+        <button type="button" class="boton boton--peligro" (click)="darDeBaja()">
+          <app-icono nombre="UserMinus" [tamano]="18" />
+          Dar de baja
+        </button>
+      } @else {
+        <button type="button" class="boton" (click)="store.reactivar(agente.id)">
+          <app-icono nombre="UserPlus" [tamano]="18" />
+          Reactivar agente
+        </button>
+      }
+    </footer>
+  }
+</article>

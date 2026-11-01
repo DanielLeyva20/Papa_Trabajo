@@ -1,0 +1,196 @@
+@let rol = store.rol();
+
+<div class="pagina">
+  <header class="cabecera">
+    <div class="mes">
+      @for (clave of [mes.mes()]; track clave) {
+        <h1 class="mes__titulo titulo-grande" [attr.data-dir]="mes.direccion()" aria-live="polite">
+          {{ partes().nombre }} <span class="mes__anio">{{ partes().year }}</span>
+        </h1>
+      }
+      <div class="mes__flechas">
+        <button type="button" class="boton boton--icono" (click)="mes.anterior()" aria-label="Mes anterior">
+          <app-icono nombre="ChevronLeft" [tamano]="20" [trazo]="2.5" />
+        </button>
+        <button type="button" class="boton boton--icono" (click)="mes.siguiente()" aria-label="Mes siguiente">
+          <app-icono nombre="ChevronRight" [tamano]="20" [trazo]="2.5" />
+        </button>
+        @if (!mes.esActual()) {
+          <button type="button" class="boton boton--plano" (click)="mes.hoy()">Hoy</button>
+        }
+      </div>
+    </div>
+
+    <div class="acciones">
+      <button
+        type="button"
+        class="boton boton--icono"
+        (click)="store.deshacer()"
+        [disabled]="!store.puedeDeshacer()"
+        title="Deshacer la última marca (Ctrl+Z)"
+        aria-label="Deshacer"
+      >
+        <app-icono nombre="Undo2" [tamano]="19" />
+      </button>
+      <button
+        type="button"
+        class="boton boton--icono"
+        (click)="limpiar()"
+        [disabled]="!rol"
+        title="Borrar las marcas del mes"
+        aria-label="Borrar marcas del mes"
+      >
+        <app-icono nombre="Trash2" [tamano]="19" />
+      </button>
+      <a class="boton" routerLink="/descargas">
+        <app-icono nombre="Download" [tamano]="18" />
+        Descargar
+      </a>
+      <button type="button" class="boton boton--primario boton--brillo" (click)="abrirGenerar()" [disabled]="!rol">
+        <app-icono nombre="CalendarCheck" [tamano]="18" />
+        Llenar mes automático
+      </button>
+    </div>
+  </header>
+
+  <span #centinela class="centinela" aria-hidden="true"></span>
+
+  @if (rol) {
+    <!-- Al bajar, esta barra queda fija arriba y muestra el mes: siempre se sabe dónde está -->
+    <nav class="sedes" [class.sedes--fija]="!tituloVisible()" aria-label="Sedes">
+      <span class="sedes__mes" aria-hidden="true">{{ mes.nombre() }}</span>
+      <div class="segmentado sedes__control" appDeslizante>
+        <span class="segmentado__indicador" aria-hidden="true"></span>
+        <button
+          type="button"
+          class="segmentado__opcion"
+          [attr.aria-current]="store.sedeActiva() === 'todas' ? 'true' : null"
+          (click)="store.elegirSede('todas')"
+        >
+          Todas
+        </button>
+        @for (sede of rol.sedes; track sede.id) {
+          <button
+            type="button"
+            class="segmentado__opcion"
+            [attr.aria-current]="store.sedeActiva() === sede.id ? 'true' : null"
+            [title]="sede.nombre"
+            (click)="store.elegirSede(sede.id)"
+          >
+            {{ sede.nombreCorto }}
+            @if (store.sedesConHuecos().has(sede.id)) {
+              <span class="sedes__alerta" role="img" aria-label="hay días con menos personal del mínimo"></span>
+            }
+          </button>
+        }
+      </div>
+    </nav>
+  }
+
+  @if (store.feriados().length) {
+    <ul class="feriados" aria-label="Feriados del mes">
+      @for (f of store.feriados(); track f.fecha; let i = $index) {
+        <li class="feriado aparecer" [style.--i]="i">
+          <span class="feriado__dia">{{ f.dia }}</span>
+          {{ f.feriado }}
+        </li>
+      }
+    </ul>
+  }
+
+  @if (store.listaConflictos().length) {
+    <div class="aviso aviso--alerta" role="alert">
+      <span class="aviso__icono"><app-icono nombre="CircleAlert" [tamano]="20" /></span>
+      <div>
+        <strong>Agentes marcados en dos sedes el mismo día</strong>
+        <ul>
+          @for (c of store.listaConflictos(); track c.nombres + c.dia) {
+            <li>{{ c.nombres }} — día {{ c.dia }}: {{ c.sedes.join(' y ') }}</li>
+          }
+        </ul>
+      </div>
+    </div>
+  }
+
+  @if (rol && store.mesVacio()) {
+    <section class="en-blanco tarjeta">
+      <span class="en-blanco__icono"><app-icono nombre="CalendarCheck" [tamano]="28" /></span>
+      <div>
+        <h2>{{ mes.nombre() }} está en blanco</h2>
+        <p>
+          Llénelo en un paso con el turno habitual de cada agente. Después solo corrija lo que cambie: faltas,
+          vacaciones o cambios de descanso.
+        </p>
+      </div>
+      <button type="button" class="boton boton--primario" (click)="abrirGenerar()">Llenar mes automático</button>
+    </section>
+  }
+
+  @if (store.cargando() && !rol) {
+    <div class="esqueleto tarjeta" aria-label="Cargando el rol">
+      @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+        <span class="esqueleto__linea" [style.--i]="i"></span>
+      }
+    </div>
+  } @else if (store.fallo() && !rol) {
+    <section class="aviso aviso--alerta sin-conexion" role="alert">
+      <span class="aviso__icono"><app-icono nombre="CircleAlert" [tamano]="20" /></span>
+      <div>
+        <strong>No se pudo abrir el rol</strong>
+        <p>
+          El sistema no responde. Si lo abrió desde el ícono «Rol de Turnos» del escritorio, espere unos segundos y
+          pulse Reintentar. Si sigue igual, cierre el navegador y vuelva a abrir el ícono.
+        </p>
+      </div>
+      <button type="button" class="boton boton--oscuro" (click)="store.cargar()">Reintentar</button>
+    </section>
+  }
+
+  @if (rol) {
+    @for (clave of [rol.mes]; track clave) {
+      <div
+        class="hojas"
+        [attr.data-dir]="mes.direccion()"
+        [class.hojas--cargando]="store.cargando()"
+        [class.hojas--saliendo]="store.cargando() && rol.mes !== mes.mes()"
+      >
+        @for (sede of store.sedesVisibles(); track sede.id; let i = $index) {
+          <section class="sede tarjeta aparecer" [style.--i]="i" [attr.aria-labelledby]="'sede-' + sede.id">
+            <header class="sede__cabecera">
+              <h2 class="sede__nombre" [id]="'sede-' + sede.id">{{ sede.nombre }}</h2>
+              <span class="chip">{{ sede.filas.length }} {{ sede.filas.length === 1 ? 'agente' : 'agentes' }}</span>
+            </header>
+            <app-cuadricula-rol
+              [sede]="sede"
+              [dias]="rol.dias"
+              [hoy]="rol.hoy"
+              [totales]="store.totales().get(sede.id)"
+              [conflictos]="store.conflictos()"
+              [codigos]="catalogo.porCodigo()"
+              [porTecla]="catalogo.porTecla()"
+              [sello]="store.sello()"
+              [oleada]="store.oleada()"
+              (marcar)="marcar($event)"
+              (inicioTrazo)="store.abrirGrupo()"
+              (finTrazo)="store.cerrarGrupo()"
+            />
+          </section>
+        }
+      </div>
+    }
+
+    <p class="ayuda">
+      Elija un sello abajo y haga clic o arrastre sobre los casilleros. Con el teclado: escriba la letra, muévase con
+      las flechas, <kbd>Supr</kbd> borra y <kbd>Ctrl</kbd>+<kbd>Z</kbd> deshace.
+    </p>
+
+    <app-paleta-sellos [codigos]="catalogo.codigos()" [activo]="store.sello()" (elegir)="store.sello.set($event)" />
+
+    <app-dialogo-generar
+      [sedes]="rol.sedes"
+      [sedeInicial]="sedeActivaRol()"
+      [nombreMes]="mes.nombre()"
+      (generar)="generar($event)"
+    />
+  }
+</div>

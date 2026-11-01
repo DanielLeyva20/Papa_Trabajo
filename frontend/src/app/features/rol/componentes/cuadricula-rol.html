@@ -1,0 +1,122 @@
+<div class="marco">
+  <table class="tabla" (keydown)="alTeclear($event)" [attr.aria-label]="'Rol de ' + sede().nombre">
+    <colgroup>
+      <col class="col-agente" />
+      @for (dia of dias(); track dia.fecha) {
+        <col />
+      }
+    </colgroup>
+
+    <thead>
+      <tr>
+        <th scope="col" class="agente agente--cabecera">Agente</th>
+        @for (dia of dias(); track dia.fecha; let i = $index) {
+          <th
+            scope="col"
+            class="dia"
+            [class.dia--feriado]="dia.feriado"
+            [class.dia--hoy]="i === indiceHoy()"
+            [class.dia--columna]="i === columna()"
+            [attr.title]="dia.feriado ? 'Feriado: ' + dia.feriado : null"
+          >
+            <span class="dia__letra">{{ dia.letra }}</span>
+            <span class="dia__numero">{{ dia.dia }}</span>
+            @if (dia.feriado) {
+              <span class="dia__punto" aria-hidden="true"></span>
+              <span class="solo-lectores">, feriado: {{ dia.feriado }}</span>
+            }
+          </th>
+        }
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (fila of sede().filas; track fila.agenteId; let f = $index) {
+        <tr [class.fila--historial]="fila.asignacionId === null">
+          <th
+            scope="row"
+            class="agente"
+            [attr.title]="fila.asignacionId === null ? fila.nombres + ' ya no está asignado a esta sede; se muestra por sus marcas de este mes.' : fila.nombres"
+          >
+            <span class="agente__contenido">
+              <app-avatar [agenteId]="fila.agenteId" [nombres]="fila.nombres" [fotoVersion]="fila.fotoVersion" [tamano]="34" />
+              <span class="agente__texto">
+                <span class="agente__nombre">{{ fila.nombres }}</span>
+                <span class="agente__cargo">{{ etiquetaCargo[fila.cargo] }}{{ fila.asignacionId === null ? ' · (antes)' : '' }}</span>
+              </span>
+            </span>
+          </th>
+          @for (codigo of fila.marcas; track $index; let d = $index) {
+            @let choque = conflicto(fila.agenteId, d);
+            <td
+              data-celda
+              [attr.data-fila]="f"
+              [attr.data-dia]="d"
+              class="celda"
+              [style.--d]="d"
+              [class.celda--feriado]="dias()[d]!.feriado"
+              [class.celda--hoy]="d === indiceHoy()"
+              [class.celda--columna]="d === columna()"
+              [class.celda--choque]="choque"
+              [attr.tabindex]="activa().fila === f && activa().dia === d ? 0 : -1"
+              [attr.aria-label]="descripcion(fila.nombres, dias()[d]!, codigo)"
+              [attr.title]="choque ? 'También marcado en: ' + choque.join(' y ') : null"
+              (pointerdown)="alPresionar($event, f, d)"
+              (pointerenter)="columna.set(d)"
+              (focus)="alEnfocar(f, d)"
+            >
+              <!-- Se recrea al cambiar de marca para que la animación se repita (D → L también "salta") -->
+              @for (c of codigo ? [codigo] : []; track c) {
+                <span
+                  class="marca"
+                  [class.marca--clara]="esClaro(c)"
+                  [style.background]="codigos().get(c)?.colorFondo"
+                  [style.color]="codigos().get(c)?.colorTexto"
+                  >{{ c }}</span
+                >
+              }
+            </td>
+          }
+        </tr>
+      } @empty {
+        <tr>
+          <td class="vacio" [attr.colspan]="dias().length + 1">
+            Esta sede todavía no tiene agentes. Agréguelos desde <strong>Personal</strong>.
+          </td>
+        </tr>
+      }
+    </tbody>
+
+    @if (totales(); as t) {
+      <tfoot>
+        <tr class="total">
+          <th scope="row" class="agente agente--total">
+            Total día
+            <span class="total__minimo">mín. {{ sede().minimoDia }}</span>
+          </th>
+          @for (n of t.dia; track $index; let d = $index) {
+            @let alerta = falta(d);
+            <td
+              class="total__celda"
+              [class.celda--hoy]="d === indiceHoy()"
+              [class.celda--columna]="d === columna()"
+              [attr.title]="alerta ? 'Faltan ' + (sede().minimoDia - n) + ' (mínimo ' + sede().minimoDia + ')' : t.completos[d] ? null : 'Día todavía sin completar'"
+            >
+              <span class="total__valor" [class.total__valor--falta]="alerta" [class.total__valor--pendiente]="!t.completos[d]">{{ n }}</span>
+            </td>
+          }
+        </tr>
+        @if (t.conNoche) {
+          <tr class="total total--noche">
+            <th scope="row" class="agente agente--total">Total noche</th>
+            @for (n of t.noche; track $index; let d = $index) {
+              <td class="total__celda" [class.celda--hoy]="d === indiceHoy()" [class.celda--columna]="d === columna()">
+                <span class="total__valor total__valor--noche">{{ n }}</span>
+              </td>
+            }
+          </tr>
+        }
+      </tfoot>
+    }
+  </table>
+</div>

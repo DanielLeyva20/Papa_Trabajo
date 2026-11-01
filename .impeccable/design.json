@@ -1,0 +1,590 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-01T00:00:00Z",
+  "title": "Design System: Rol de Turnos",
+  "extensions": {
+    "colorMeta": {
+      "fondo": {
+        "role": "neutral",
+        "displayName": "Desk Grey",
+        "tonalRamp": [
+          "#1d1d1f",
+          "#3a3a3c",
+          "#5f5f64",
+          "#6e6e73",
+          "#8e8e93",
+          "#c7c7cc",
+          "#e5e5ea",
+          "#f5f5f7"
+        ]
+      },
+      "superficie": {
+        "role": "neutral",
+        "displayName": "Sheet White",
+        "tonalRamp": [
+          "#1d1d1f",
+          "#3a3a3c",
+          "#636366",
+          "#8e8e93",
+          "#c7c7cc",
+          "#e5e5ea",
+          "#f5f5f7",
+          "#ffffff"
+        ]
+      },
+      "superficie-2": {
+        "role": "neutral",
+        "displayName": "Sheet Tint",
+        "tonalRamp": [
+          "#1d1d1f",
+          "#3a3a3c",
+          "#636366",
+          "#8e8e93",
+          "#c7c7cc",
+          "#e5e5ea",
+          "#f5f5f7",
+          "#fbfbfd"
+        ]
+      },
+      "relleno": {
+        "role": "neutral",
+        "displayName": "Control Fill",
+        "canonical": "rgb(118 118 128 / 0.12)",
+        "tonalRamp": [
+          "rgb(118 118 128 / 0.8)",
+          "rgb(118 118 128 / 0.55)",
+          "rgb(118 118 128 / 0.4)",
+          "rgb(118 118 128 / 0.28)",
+          "rgb(118 118 128 / 0.18)",
+          "rgb(118 118 128 / 0.12)",
+          "rgb(118 118 128 / 0.07)",
+          "rgb(118 118 128 / 0.03)"
+        ]
+      },
+      "relleno-suave": {
+        "role": "neutral",
+        "displayName": "Soft Fill",
+        "canonical": "rgb(118 118 128 / 0.07)",
+        "tonalRamp": [
+          "rgb(118 118 128 / 0.8)",
+          "rgb(118 118 128 / 0.55)",
+          "rgb(118 118 128 / 0.4)",
+          "rgb(118 118 128 / 0.28)",
+          "rgb(118 118 128 / 0.18)",
+          "rgb(118 118 128 / 0.12)",
+          "rgb(118 118 128 / 0.07)",
+          "rgb(118 118 128 / 0.03)"
+        ]
+      },
+      "separador": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "rgb(60 60 67 / 0.12)",
+        "tonalRamp": [
+          "rgb(60 60 67 / 0.8)",
+          "rgb(60 60 67 / 0.55)",
+          "rgb(60 60 67 / 0.4)",
+          "rgb(60 60 67 / 0.28)",
+          "rgb(60 60 67 / 0.18)",
+          "rgb(60 60 67 / 0.12)",
+          "rgb(60 60 67 / 0.07)",
+          "rgb(60 60 67 / 0.03)"
+        ]
+      },
+      "separador-fuerte": {
+        "role": "neutral",
+        "displayName": "Strong Hairline",
+        "canonical": "rgb(60 60 67 / 0.22)",
+        "tonalRamp": [
+          "rgb(60 60 67 / 0.8)",
+          "rgb(60 60 67 / 0.55)",
+          "rgb(60 60 67 / 0.4)",
+          "rgb(60 60 67 / 0.28)",
+          "rgb(60 60 67 / 0.18)",
+          "rgb(60 60 67 / 0.12)",
+          "rgb(60 60 67 / 0.07)",
+          "rgb(60 60 67 / 0.03)"
+        ]
+      },
+      "vidrio": {
+        "role": "neutral",
+        "displayName": "Glass",
+        "canonical": "rgb(255 255 255 / 0.72)",
+        "tonalRamp": [
+          "rgb(255 255 255 / 1)",
+          "rgb(255 255 255 / 0.92)",
+          "rgb(255 255 255 / 0.86)",
+          "rgb(255 255 255 / 0.72)",
+          "rgb(255 255 255 / 0.6)",
+          "rgb(255 255 255 / 0.45)",
+          "rgb(255 255 255 / 0.3)",
+          "rgb(255 255 255 / 0.16)"
+        ]
+      },
+      "vidrio-oscuro": {
+        "role": "neutral",
+        "displayName": "Dark Glass",
+        "canonical": "rgb(29 29 31 / 0.86)",
+        "tonalRamp": [
+          "rgb(29 29 31 / 1)",
+          "rgb(29 29 31 / 0.92)",
+          "rgb(29 29 31 / 0.86)",
+          "rgb(29 29 31 / 0.72)",
+          "rgb(29 29 31 / 0.6)",
+          "rgb(29 29 31 / 0.45)",
+          "rgb(29 29 31 / 0.3)",
+          "rgb(29 29 31 / 0.16)"
+        ]
+      },
+      "texto": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "tonalRamp": [
+          "#1d1d1f",
+          "#3a3a3c",
+          "#5f5f64",
+          "#6e6e73",
+          "#8e8e93",
+          "#c7c7cc",
+          "#e5e5ea",
+          "#f5f5f7"
+        ]
+      },
+      "texto-2": {
+        "role": "neutral",
+        "displayName": "Secondary Ink",
+        "tonalRamp": [
+          "#1d1d1f",
+          "#3a3a3c",
+          "#5f5f64",
+          "#6e6e73",
+          "#8e8e93",
+          "#c7c7cc",
+          "#e5e5ea",
+          "#f5f5f7"
+        ]
+      },
+      "texto-3": {
+        "role": "neutral",
+        "displayName": "Tertiary Ink",
+        "tonalRamp": [
+          "#1d1d1f",
+          "#3a3a3c",
+          "#5f5f64",
+          "#6e6e73",
+          "#8e8e93",
+          "#c7c7cc",
+          "#e5e5ea",
+          "#f5f5f7"
+        ]
+      },
+      "azul": {
+        "role": "primary",
+        "displayName": "Action Blue",
+        "tonalRamp": [
+          "#002a57",
+          "#003f80",
+          "#0062c4",
+          "#0071e3",
+          "#2f8ff0",
+          "#6aaef5",
+          "#b3d4fa",
+          "#e6f1fd"
+        ]
+      },
+      "azul-hondo": {
+        "role": "primary",
+        "displayName": "Deep Action Blue",
+        "tonalRamp": [
+          "#002a57",
+          "#003f80",
+          "#0062c4",
+          "#0071e3",
+          "#2f8ff0",
+          "#6aaef5",
+          "#b3d4fa",
+          "#e6f1fd"
+        ]
+      },
+      "azul-velo": {
+        "role": "primary",
+        "displayName": "Blue Veil",
+        "canonical": "rgb(0 113 227 / 0.1)",
+        "tonalRamp": [
+          "rgb(0 113 227 / 0.8)",
+          "rgb(0 113 227 / 0.55)",
+          "rgb(0 113 227 / 0.4)",
+          "rgb(0 113 227 / 0.28)",
+          "rgb(0 113 227 / 0.18)",
+          "rgb(0 113 227 / 0.12)",
+          "rgb(0 113 227 / 0.07)",
+          "rgb(0 113 227 / 0.03)"
+        ]
+      },
+      "rojo": {
+        "role": "secondary",
+        "displayName": "Signal Red",
+        "tonalRamp": [
+          "#4d0007",
+          "#80000c",
+          "#b30012",
+          "#d70015",
+          "#e8434f",
+          "#f2828a",
+          "#f9c0c4",
+          "#fdeced"
+        ]
+      },
+      "rojo-velo": {
+        "role": "secondary",
+        "displayName": "Red Veil",
+        "canonical": "rgb(215 0 21 / 0.07)",
+        "tonalRamp": [
+          "rgb(215 0 21 / 0.8)",
+          "rgb(215 0 21 / 0.55)",
+          "rgb(215 0 21 / 0.4)",
+          "rgb(215 0 21 / 0.28)",
+          "rgb(215 0 21 / 0.18)",
+          "rgb(215 0 21 / 0.12)",
+          "rgb(215 0 21 / 0.07)",
+          "rgb(215 0 21 / 0.03)"
+        ]
+      },
+      "verde": {
+        "role": "tertiary",
+        "displayName": "Grass Green",
+        "tonalRamp": [
+          "#0b2e14",
+          "#14501f",
+          "#1d6e31",
+          "#248a3d",
+          "#4aa963",
+          "#80c690",
+          "#bfe3c6",
+          "#ebf6ed"
+        ]
+      },
+      "verde-velo": {
+        "role": "tertiary",
+        "displayName": "Green Veil",
+        "canonical": "rgb(36 138 61 / 0.1)",
+        "tonalRamp": [
+          "rgb(36 138 61 / 0.8)",
+          "rgb(36 138 61 / 0.55)",
+          "rgb(36 138 61 / 0.4)",
+          "rgb(36 138 61 / 0.28)",
+          "rgb(36 138 61 / 0.18)",
+          "rgb(36 138 61 / 0.12)",
+          "rgb(36 138 61 / 0.07)",
+          "rgb(36 138 61 / 0.03)"
+        ]
+      },
+      "amarillo": {
+        "role": "tertiary",
+        "displayName": "Sun Yellow",
+        "tonalRamp": [
+          "#4d3d00",
+          "#806600",
+          "#b38f00",
+          "#e6b800",
+          "#ffcc00",
+          "#ffdb4d",
+          "#ffeb99",
+          "#fff9e0"
+        ]
+      },
+      "indigo": {
+        "role": "tertiary",
+        "displayName": "Night Indigo",
+        "tonalRamp": [
+          "#1b1a4a",
+          "#2d2b78",
+          "#4240a8",
+          "#5856d6",
+          "#7b79e0",
+          "#a2a1ea",
+          "#cbcaf4",
+          "#efeffc"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Month title and page titles; year in Tertiary Ink."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section titles inside pages."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Sede names, dialog titles, Descargas format names."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running text on a 17px root with tabular figures."
+      },
+      "control": {
+        "displayName": "Control",
+        "purpose": "Buttons, segmented options, day numbers, marks."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Field labels, chips, agent names, totals."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Weekday letters, agent roles, table headers, mobile nav labels."
+      }
+    },
+    "shadows": [
+      {
+        "name": "sombra-1",
+        "value": "0 1px 2px rgb(0 0 0 / 0.04), 0 2px 10px rgb(0 0 0 / 0.04)",
+        "purpose": "Rest: every card."
+      },
+      {
+        "name": "sombra-2",
+        "value": "0 2px 6px rgb(0 0 0 / 0.05), 0 18px 40px -16px rgb(0 0 0 / 0.16)",
+        "purpose": "Raised panels."
+      },
+      {
+        "name": "sombra-flotante",
+        "value": "0 10px 30px rgb(0 0 0 / 0.12), 0 30px 70px -20px rgb(0 0 0 / 0.3)",
+        "purpose": "Floating: Dock, toasts, dialogs."
+      },
+      {
+        "name": "indicador",
+        "value": "0 3px 8px rgb(0 0 0 / 0.12), 0 3px 1px rgb(0 0 0 / 0.04)",
+        "purpose": "Sliding white pill in segmented controls."
+      },
+      {
+        "name": "brillo-azul",
+        "value": "0 4px 14px -4px rgb(0 113 227 / 0.55)",
+        "purpose": "Primary blue button only."
+      },
+      {
+        "name": "foco-entrada",
+        "value": "0 0 0 4px rgb(0 113 227 / 0.16)",
+        "purpose": "Input focus halo."
+      }
+    ],
+    "motion": [
+      {
+        "name": "resorte",
+        "value": "cubic-bezier(0.32, 0.72, 0, 1)",
+        "purpose": "Default spring: state changes, sliding indicators, entrances, route changes."
+      },
+      {
+        "name": "rebote",
+        "value": "cubic-bezier(0.34, 1.28, 0.64, 1)",
+        "purpose": "Recorded exception, tap/press feedback only: stamps, day numbers, totals, icons, toasts."
+      },
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.23, 1, 0.32, 1)",
+        "purpose": "Exits, fades, button press."
+      },
+      {
+        "name": "indicador",
+        "value": "420ms var(--resorte)",
+        "purpose": "Segmented indicator slide (transform and width), enabled after first measure."
+      },
+      {
+        "name": "sellar",
+        "value": "280ms var(--rebote) from scale(0.6) opacity 0.4",
+        "purpose": "Pointer-placed stamp pop; keyboard marks are not animated."
+      },
+      {
+        "name": "ola",
+        "value": "620ms var(--resorte), delay var(--d) * 22ms",
+        "purpose": "Llenar mes wave cascading by day column."
+      },
+      {
+        "name": "vista",
+        "value": "out 180ms ease-out to blur(4px) scale(0.99); in 360ms resorte from blur(6px) translateY(12px)",
+        "purpose": "View Transitions blur crossfade between routes."
+      },
+      {
+        "name": "aparecer",
+        "value": "520ms var(--resorte), delay var(--i) * 28ms",
+        "purpose": "Staggered list entrance."
+      },
+      {
+        "name": "aviso",
+        "value": "420ms var(--rebote) from blur(6px) translateY(24px) scale(0.92)",
+        "purpose": "Glass toast spring entrance."
+      },
+      {
+        "name": "alerta",
+        "value": "320ms var(--resorte) from blur(8px) scale(1.06); scrim rgb(0 0 0 / 0.28) blur(6px)",
+        "purpose": "Dialog materializes over a blurred scrim."
+      },
+      {
+        "name": "reduced",
+        "value": "prefers-reduced-motion: all durations 1ms, view transitions off; prefers-reduced-transparency: --vidrio opaque white",
+        "purpose": "Accessibility preferences honored."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "mobile",
+        "value": "600px"
+      },
+      {
+        "name": "compact",
+        "value": "900px"
+      },
+      {
+        "name": "wrap",
+        "value": "1180px"
+      },
+      {
+        "name": "sticky-sede-bar",
+        "value": "1181px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Blue pill for the one main action (Llenar mes automático), CalendarCheck icon.",
+      "html": "<button class=\"ds-boton ds-boton--primario\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M8 2v4\"/><path d=\"M16 2v4\"/><rect width=\"18\" height=\"18\" x=\"3\" y=\"4\" rx=\"2\"/><path d=\"M3 10h18\"/><path d=\"m9 16 2 2 4-4\"/></svg>Llenar mes automático</button>",
+      "css": ".ds-boton{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 24px;border:0;border-radius:999px;font-family:var(--f-texto);font-size:0.9375rem;font-weight:600;cursor:pointer;transition:transform 160ms var(--ease-out),background-color 200ms ease}.ds-boton--primario{background:var(--azul);color:#fff;box-shadow:0 4px 14px -4px rgb(0 113 227 / 0.55)}.ds-boton--primario:hover{background:var(--azul-hondo)}.ds-boton:active{transform:scale(0.96);transition-duration:80ms}.ds-boton:focus-visible{outline:3px solid rgb(0 113 227 / 0.55);outline-offset:2px}"
+    },
+    {
+      "name": "Default Button",
+      "kind": "button",
+      "refersTo": "button",
+      "description": "Grey-fill pill for secondary actions (Descargar, month arrows as 44px circles).",
+      "html": "<button class=\"ds-boton-def\">Descargar</button>",
+      "css": ".ds-boton-def{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 24px;border:0;border-radius:999px;background:var(--relleno);color:var(--texto);font-family:var(--f-texto);font-size:0.9375rem;font-weight:600;cursor:pointer;transition:transform 160ms var(--ease-out),background-color 200ms ease}.ds-boton-def:hover{background:rgb(118 118 128 / 0.18)}.ds-boton-def:active{transform:scale(0.96);transition-duration:80ms}.ds-boton-def:focus-visible{outline:3px solid rgb(0 113 227 / 0.55);outline-offset:2px}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Labeled 44px field with a blue focus halo.",
+      "html": "<label class=\"ds-campo\"><span>Nombre</span><input class=\"ds-entrada\" placeholder=\"Apellidos y nombres\"></label>",
+      "css": ".ds-campo{display:grid;gap:6px;font-family:var(--f-texto)}.ds-campo>span{padding-left:4px;font-weight:600;font-size:0.8125rem;color:var(--texto-2)}.ds-entrada{min-height:44px;padding:0 16px;border:1px solid var(--separador-fuerte);border-radius:12px;background:var(--superficie);font:inherit;transition:border-color 200ms ease,box-shadow 200ms ease}.ds-entrada::placeholder{color:var(--texto-3)}.ds-entrada:focus{outline:none;border-color:var(--azul);box-shadow:0 0 0 4px rgb(0 113 227 / 0.16)}"
+    },
+    {
+      "name": "Segmented Control",
+      "kind": "nav",
+      "refersTo": "segmented-track",
+      "description": "Nav, sede bar and Dock switcher: a white sliding pill on a grey track.",
+      "html": "<div class=\"ds-seg\"><span class=\"ds-seg__ind\"></span><button class=\"ds-seg__op\" aria-current=\"page\">Todas</button><button class=\"ds-seg__op\">Principal</button><button class=\"ds-seg__op\">Archivo</button></div>",
+      "css": ".ds-seg{position:relative;display:inline-flex;gap:2px;padding:3px;border-radius:12px;background:var(--relleno);isolation:isolate;font-family:var(--f-texto)}.ds-seg__ind{position:absolute;top:3px;bottom:3px;left:3px;width:96px;z-index:-1;border-radius:9px;background:var(--superficie);box-shadow:0 3px 8px rgb(0 0 0 / 0.12),0 3px 1px rgb(0 0 0 / 0.04);transition:transform 420ms var(--resorte),width 420ms var(--resorte)}.ds-seg:has(.ds-seg__op:nth-of-type(2):hover) .ds-seg__ind{transform:translateX(98px)}.ds-seg:has(.ds-seg__op:nth-of-type(3):hover) .ds-seg__ind{transform:translateX(196px)}.ds-seg__op{min-height:36px;width:96px;padding:0 16px;border:0;border-radius:9px;background:transparent;color:var(--texto-2);font:inherit;font-size:0.9375rem;font-weight:600;cursor:pointer;transition:color 200ms ease}.ds-seg__op[aria-current],.ds-seg__op:hover{color:var(--texto)}.ds-seg__op:focus-visible{outline:3px solid rgb(0 113 227 / 0.55);outline-offset:2px}"
+    },
+    {
+      "name": "Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Soft-fill count pill (e.g. 9 agentes).",
+      "html": "<span class=\"ds-chip\">9 agentes</span>",
+      "css": ".ds-chip{display:inline-flex;align-items:center;gap:4px;min-height:26px;padding:0 10px;border-radius:999px;background:var(--relleno-suave);font-family:var(--f-texto);font-size:0.8125rem;font-weight:600;color:var(--texto-2)}"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "White sheet on the grey desk with a whisper shadow.",
+      "html": "<section class=\"ds-tarjeta\"><h2>Sede Principal Cañete</h2><p>Rol del mes por agente y día.</p></section>",
+      "css": ".ds-tarjeta{padding:24px;border-radius:22px;background:var(--superficie);box-shadow:var(--sombra-1);font-family:var(--f-texto)}.ds-tarjeta h2{margin:0;font-size:1.3125rem;font-weight:700;letter-spacing:-0.022em}.ds-tarjeta p{margin:4px 0 0;color:var(--texto-2)}"
+    },
+    {
+      "name": "TOTAL DÍA Pills",
+      "kind": "custom",
+      "refersTo": "total-pending",
+      "description": "Pending outlined in Secondary Ink, complete filled soft, complete-and-short solid red.",
+      "html": "<div class=\"ds-totales\"><span class=\"ds-total ds-total--pend\">4</span><span class=\"ds-total ds-total--ok\">7</span><span class=\"ds-total ds-total--falta\">5</span></div>",
+      "css": ".ds-totales{display:flex;gap:12px;font-family:var(--f-texto)}.ds-total{display:inline-grid;place-items:center;min-width:26px;height:26px;padding:0 4px;border-radius:999px;font-size:0.8125rem;font-weight:700;font-variant-numeric:tabular-nums;transition:background-color 240ms ease,color 240ms ease,transform 300ms var(--rebote)}.ds-total--pend{color:var(--texto-2);font-weight:500;box-shadow:inset 0 0 0 1px var(--separador-fuerte)}.ds-total--ok{background:var(--relleno-suave);color:var(--texto)}.ds-total--falta{background:var(--rojo);color:#fff;transform:scale(1.08)}"
+    },
+    {
+      "name": "Day Header",
+      "kind": "custom",
+      "refersTo": "day-today",
+      "description": "Weekday letter over day number: plain (Sunday included), today blue circle, holiday red, holiday-today red circle.",
+      "html": "<div class=\"ds-dias\"><span class=\"ds-dia\"><b>D</b><i>8</i></span><span class=\"ds-dia ds-dia--hoy\"><b>L</b><i>9</i></span><span class=\"ds-dia ds-dia--feriado\"><b>D</b><i>1</i></span><span class=\"ds-dia ds-dia--feriado ds-dia--hoy\"><b>V</b><i>25</i></span></div>",
+      "css": ".ds-dias{display:flex;gap:10px;font-family:var(--f-texto)}.ds-dia{display:grid;justify-items:center;gap:5px;line-height:1}.ds-dia b{font-size:0.75rem;font-weight:600;color:var(--texto-2)}.ds-dia i{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;font-style:normal;font-size:0.9375rem;font-weight:600;font-variant-numeric:tabular-nums;transition:transform 260ms var(--rebote),background-color 200ms ease}.ds-dia:hover i{transform:scale(1.12)}.ds-dia:not(.ds-dia--hoy):hover i{background:var(--relleno)}.ds-dia--hoy b{color:var(--azul)}.ds-dia--hoy i{background:var(--azul);color:#fff}.ds-dia--feriado b,.ds-dia--feriado i{color:var(--rojo)}.ds-dia--feriado.ds-dia--hoy i{background:var(--rojo);color:#fff}"
+    },
+    {
+      "name": "Dock of Stamps",
+      "kind": "custom",
+      "refersTo": "dock",
+      "description": "Floating glass toolbar: scrollable stamps with a sliding indicator, Borrar pinned outside behind a separator.",
+      "html": "<div class=\"ds-dock\"><div class=\"ds-dock__sellos\"><button class=\"ds-sello\" aria-pressed=\"true\"><span class=\"ds-sello__m\" style=\"background:#fff;color:#1d1d1f;box-shadow:inset 0 0 0 1px rgb(60 60 67 / 0.22)\">D</span>Día</button><button class=\"ds-sello\"><span class=\"ds-sello__m\" style=\"background:#5856D6;color:#fff\">N</span>Noche</button><button class=\"ds-sello\"><span class=\"ds-sello__m\" style=\"background:#FFCC00;color:#1d1d1f\">L</span>Libre</button></div><span class=\"ds-dock__sep\"></span><button class=\"ds-sello\"><span class=\"ds-sello__m ds-sello__m--borrar\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21\"/><path d=\"M22 21H7\"/><path d=\"m5 11 9 9\"/></svg></span>Borrar</button></div>",
+      "css": ".ds-dock{display:inline-flex;align-items:center;padding:6px;border-radius:22px;background:rgb(255 255 255 / 0.92);backdrop-filter:blur(28px) saturate(190%);border:0.5px solid rgb(255 255 255 / 0.6);box-shadow:var(--sombra-flotante);font-family:var(--f-texto)}.ds-dock__sellos{display:flex;gap:2px}.ds-dock__sep{width:1px;height:28px;margin:0 6px;background:var(--separador-fuerte)}.ds-sello{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 14px 0 8px;border:0;border-radius:16px;background:transparent;color:var(--texto-2);font:inherit;font-size:0.8125rem;font-weight:600;cursor:pointer;transition:color 200ms ease}.ds-sello[aria-pressed=true]{background:var(--superficie);color:var(--texto);box-shadow:0 2px 10px rgb(0 0 0 / 0.12),0 0 0 0.5px rgb(0 0 0 / 0.06)}.ds-sello__m{display:inline-grid;place-items:center;min-width:32px;height:32px;padding:0 4px;border-radius:10px;font-size:0.9375rem;font-weight:700;box-shadow:0 2px 6px rgb(0 0 0 / 0.12);transition:transform 360ms var(--rebote)}.ds-sello[aria-pressed=true] .ds-sello__m{transform:scale(1.1)}.ds-sello:hover .ds-sello__m{transform:translateY(-3px) scale(1.12)}.ds-sello:active .ds-sello__m{transform:scale(0.9);transition-duration:80ms}.ds-sello__m--borrar{background:var(--relleno);color:var(--texto-2);box-shadow:none}.ds-sello:focus-visible{outline:3px solid rgb(0 113 227 / 0.55);outline-offset:2px}"
+    },
+    {
+      "name": "Glass Toast",
+      "kind": "custom",
+      "refersTo": "toast",
+      "description": "Dark glass pill that springs in above the Dock.",
+      "html": "<div class=\"ds-aviso\"><span class=\"ds-aviso__i\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 6 9 17l-5-5\"/></svg></span><p>Mes llenado</p><button class=\"ds-aviso__acc\">Deshacer</button></div>",
+      "css": ".ds-aviso{display:inline-flex;align-items:center;gap:12px;padding:10px 10px 10px 12px;border-radius:20px;background:var(--vidrio-oscuro);backdrop-filter:blur(20px) saturate(180%);color:#fff;box-shadow:var(--sombra-flotante);font-family:var(--f-texto)}.ds-aviso p{margin:0;font-size:0.9375rem;font-weight:500}.ds-aviso__i{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#30d158;color:#fff}.ds-aviso__acc{min-height:34px;padding:0 12px;border:0;border-radius:999px;background:rgb(255 255 255 / 0.16);color:#fff;font:inherit;font-size:0.8125rem;font-weight:600;cursor:pointer}.ds-aviso__acc:hover{background:rgb(255 255 255 / 0.24)}.ds-aviso__acc:focus-visible{outline:3px solid rgb(0 113 227 / 0.55);outline-offset:2px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Quiet Pro Tool",
+    "overview": "Rol de Turnos is a desktop tool built with Apple's craft. The world is a pale warm-grey desk (#f5f5f7) with white sheets on it. The sheets have soft, generous corners and barely-there shadows. The chrome is translucent glass: the top bar, the sticky sede bar, the floating Dock of stamps, toasts and dialogs all let the content blur through underneath. The month grid is the product and everything else stays out of its way. Ink is near-black, secondary text is a measured grey, and one blue is for action. Red is reserved for meaning and never used for decoration.\n\nThe density is calm, but the grid is a working instrument. Agent names stay pinned to the left, day columns have a fixed width, and only the mark inside each cell changes. Segmented controls with a sliding white pill do all the switching: navigation, sede, and the stamp in hand. Motion is lively on purpose, because the user asked for \"premium, interactive, with animations\". Springs carry state changes, a small bounce answers a tap, and filling the month arrives as a wave. Reduced-motion and reduced-transparency preferences are honored everywhere.\n\nThis world replaces the previous \"Almanaque de pared\" world (red wall-calendar, condensed display type). Nothing from that world carries over. Calendar red now marks only holidays and staffing shortfall, and Sundays are neutral.",
+    "keyCharacteristics": [
+      "Pale warm-grey ground, white sheets with 18–22px corners, hairline separators at 0.5px.",
+      "Translucent glass for every floating or sticky layer (backdrop blur 20–30px, saturate 180–190%).",
+      "One blue for action and \"today\"; red only for holidays, staffing shortfall, and error alerts.",
+      "Segmented controls with a sliding white indicator on a grey track, driven by one shared directive.",
+      "Inter Variable with optical sizing standing in for SF Pro; large bold titles with tight negative tracking.",
+      "Spring-curve motion with a recorded bounce exception for tap feedback."
+    ],
+    "rules": [
+      {
+        "name": "The Meaningful Red Rule",
+        "body": "On the calendar, red means a holiday or a staffing shortfall, nothing else. Sundays are neutral and get the same ink as every other day. Today is a blue filled circle; a holiday that is today is a red filled circle. Outside the grid, red is limited to errors and destructive actions.",
+        "section": "colors"
+      },
+      {
+        "name": "The Judge-When-Complete Rule",
+        "body": "A day's TOTAL DÍA is not judged until every agent in the day has a mark. A pending day is a hairline-outlined pill in Secondary Ink. A complete day that meets the minimum is a filled Soft Fill pill. A complete day below the sede's minimoDia is a solid red pill, scaled 1.08. The sede tab dot follows the same rule: it pulses red only when a complete day is short.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Family Rule",
+        "body": "Hierarchy comes from size, weight (400/600/700) and negative tracking within Inter Variable. Don't introduce a second display face.",
+        "section": "typography"
+      },
+      {
+        "name": "The Day-Row-Stays-Visible Rule",
+        "body": "Only the sede bar may stick. Sticky per-sede headers were tried and rejected because they covered the day-number row.",
+        "section": "layout"
+      },
+      {
+        "name": "The Glass-For-What-Floats Rule",
+        "body": "Anything that floats or sticks over content is translucent with backdrop blur. This covers the top bar, the stuck sede bar, the Dock, toasts, dialogs and the dialog scrim. Under prefers-reduced-transparency the glass turns opaque white.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep calendar red to holidays and staffing shortfall; mark today with a blue filled circle (red filled when today is a holiday).",
+      "Do judge TOTAL DÍA only on complete days: outlined pending pill in Secondary Ink, Soft Fill pill when met, solid red pill when below minimoDia; mirror the same rule on the sede tab dot.",
+      "Do switch between peers with a segmented control and the Deslizante sliding white pill on a Control Fill track.",
+      "Do make every floating or sticky layer glass, and provide the opaque fallback under prefers-reduced-transparency.",
+      "Do use --resorte for state and entrance motion; reserve --rebote for tap and press feedback.",
+      "Do animate stamp pops only for pointer marks, never for keyboard marks.",
+      "Do keep nav labels visible under icons on mobile (0.75rem).",
+      "Do keep secondary text at Secondary Ink or Tertiary Ink (at least 4.5:1); never lighter.",
+      "Do crop agent photos square and compress to 400px WEBP before upload; fall back to tinted initials."
+    ],
+    "donts": [
+      "Don't color Sundays; they are neutral by the user's explicit request.",
+      "Don't make per-sede grid headers sticky; they cover the day-number row.",
+      "Don't put kickers or eyebrow labels above headings; titles stand alone.",
+      "Don't nest cards inside cards; group related rows in one card with hairline separators.",
+      "Don't use sparkle or \"AI\" glyphs for automatic fill; \"Llenar mes\" uses CalendarCheck.",
+      "Don't let the Dock hide Borrar; it is pinned outside the scrolling stamp group.",
+      "Don't reintroduce the \"Almanaque de pared\" world's condensed display face or red-dominant chrome."
+    ]
+  }
+}

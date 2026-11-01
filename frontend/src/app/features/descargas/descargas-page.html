@@ -1,0 +1,141 @@
+<div class="pagina">
+  <section class="tarjeta bloque" aria-labelledby="descargas-titulo">
+    <header class="bloque__cabecera">
+      <div>
+        <h1 id="descargas-titulo" class="titulo-grande">Descargas</h1>
+        <p class="texto-secundario">Elija el mes y el tipo de archivo.</p>
+      </div>
+      <app-selector-mes />
+    </header>
+
+    <ul class="formatos">
+      @for (formato of formatos; track formato.id) {
+        <li class="formato" [attr.data-formato]="formato.id">
+          <span class="formato__icono">
+            <app-icono [nombre]="formato.icono" [tamano]="32" [trazo]="1.75" />
+          </span>
+          <div class="formato__texto">
+            <h2>{{ formato.titulo }} · {{ mes.nombre() }}</h2>
+            <p>{{ formato.descripcion }}</p>
+          </div>
+          <div class="formato__botones">
+            @if (mes.esActual()) {
+              <a class="boton" [href]="url(formato.id, 'hasta-hoy')" download (click)="avisarDescarga()">
+                <app-icono nombre="Download" />
+                Avance hasta hoy
+              </a>
+            }
+            <a class="boton boton--primario" [href]="url(formato.id, 'completo')" download (click)="avisarDescarga()">
+              <app-icono nombre="Download" />
+              Mes completo
+            </a>
+          </div>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <section class="tarjeta bloque" aria-labelledby="resumen-titulo">
+    <h2 id="resumen-titulo" class="subtitulo">Resumen de {{ mes.nombre() }}</h2>
+    <p class="texto-secundario">Cuántos días de cada marca tiene cada agente en el mes, sumando todas sus sedes.</p>
+
+    @if (resumen.hasValue() ? resumen.value() : null; as datos) {
+      <div class="tabla-marco">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th scope="col">Agente</th>
+              <th scope="col">Sedes</th>
+              @for (c of catalogo.codigos(); track c.codigo) {
+                <th scope="col" class="num" [title]="c.nombre">
+                  <span class="marca" [style.background]="c.colorFondo" [style.color]="c.colorTexto"
+                    [class.marca--clara]="c.colorFondo.toUpperCase() === '#FFFFFF'">{{ c.codigo }}</span>
+                </th>
+              }
+              <th scope="col" class="num">Días trabajados</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (a of datos.agentes; track a.agenteId) {
+              <tr>
+                <th scope="row">
+                  {{ a.nombres }}
+                  <small>{{ etiquetaCargo[a.cargo] }}</small>
+                </th>
+                <td class="sedes">{{ a.sedes.join(', ') }}</td>
+                @for (c of catalogo.codigos(); track c.codigo) {
+                  <td class="num" [class.cero]="!a.conteos[c.codigo]">{{ a.conteos[c.codigo] ?? 0 }}</td>
+                }
+                <td class="num total">{{ a.diasTrabajados }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="cuadro__titulo">Distribución de agentes – turno diurno</h3>
+      <div class="tabla-marco">
+        <table class="tabla tabla--cuadro">
+          <thead>
+            <tr>
+              <th scope="col" class="num">N.º</th>
+              <th scope="col">Sede / Dependencia</th>
+              @for (cargo of cargosCuadro; track cargo) {
+                <th scope="col" class="num">{{ etiquetaCargo[cargo] }}</th>
+              }
+              <th scope="col" class="num">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (s of datos.distribucionDia.sedes; track s.sedeId; let i = $index) {
+              <tr>
+                <td class="num">{{ i + 1 }}</td>
+                <th scope="row">{{ s.nombre }}</th>
+                @for (cargo of cargosCuadro; track cargo) {
+                  <td class="num" [class.cero]="!s.porCargo[cargo]">{{ s.porCargo[cargo] }}</td>
+                }
+                <td class="num total">{{ s.total }}</td>
+              </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr>
+              <td></td>
+              <th scope="row">Total</th>
+              @for (cargo of cargosCuadro; track cargo) {
+                <td class="num">{{ datos.distribucionDia.totales[cargo] }}</td>
+              }
+              <td class="num">{{ datos.distribucionDia.totales.total }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <p class="nota">
+        Cuenta a los agentes fijos según su semana habitual (pantalla Personal). Las féminas descanseras no se cuentan
+        porque solo cubren días sueltos.
+      </p>
+    } @else if (resumen.isLoading()) {
+      <p class="cargando">Calculando…</p>
+    }
+  </section>
+
+  <section class="tarjeta bloque respaldo" aria-labelledby="respaldo-titulo">
+    <app-icono nombre="HardDriveDownload" [tamano]="32" [trazo]="1.75" />
+    <div>
+      <h2 id="respaldo-titulo" class="subtitulo">Copia de seguridad</h2>
+      <p class="texto-secundario">
+        @if (respaldo.hasValue() ? respaldo.value() : null; as r) {
+          {{ r.descripcion }}
+        }
+      </p>
+      <p class="texto-secundario">
+        Además, puede descargar una copia completa (agentes, fotos, marcas y feriados) y guardarla en su PC o en una
+        memoria USB:
+      </p>
+    </div>
+    <a class="boton" [href]="reportes.urlRespaldo" download (click)="avisarDescarga()">
+      <app-icono nombre="Download" />
+      Descargar copia
+    </a>
+  </section>
+</div>

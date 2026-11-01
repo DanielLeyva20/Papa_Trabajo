@@ -1,0 +1,261 @@
+.pagina {
+  display: grid;
+  gap: var(--e-5);
+  max-width: 1600px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.pagina--con-editor {
+  grid-template-columns: minmax(0, 1fr) minmax(440px, 560px);
+}
+
+.lista {
+  display: grid;
+  gap: var(--e-4);
+  min-width: 0;
+}
+
+.lista__cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--e-4);
+
+  p {
+    margin-top: var(--e-1);
+  }
+}
+
+.lista__herramientas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-3);
+}
+
+.lista__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-3) var(--e-5);
+}
+
+.buscar {
+  position: relative;
+  flex: 1 1 280px;
+  max-width: 480px;
+
+  app-icono {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--texto-3);
+  }
+
+  .entrada {
+    padding-left: 42px;
+    border-color: transparent;
+    background: var(--relleno);
+
+    &:focus {
+      background: var(--superficie);
+    }
+  }
+}
+
+// Interruptor estilo iOS
+.interruptor {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-3);
+  min-height: var(--toque);
+  font-size: var(--t-sm);
+  font-weight: 500;
+  cursor: pointer;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.interruptor__pista {
+  position: relative;
+  width: 51px;
+  height: 31px;
+  border-radius: var(--pildora);
+  background: rgb(120 120 128 / 0.16);
+  transition: background-color 250ms ease;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 27px;
+    height: 27px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 3px 8px rgb(0 0 0 / 0.15), 0 3px 1px rgb(0 0 0 / 0.06);
+    transition: transform 320ms var(--resorte);
+  }
+}
+
+.interruptor input:checked + .interruptor__pista {
+  background: #34c759;
+
+  &::after {
+    transform: translateX(20px);
+  }
+}
+
+.interruptor input:focus-visible + .interruptor__pista {
+  outline: 3px solid rgb(0 113 227 / 0.55);
+  outline-offset: 2px;
+}
+
+// ---------- Lista tipo Contactos ----------
+.contactos {
+  margin: 0;
+  padding: var(--e-2);
+  list-style: none;
+}
+
+.contacto {
+  display: flex;
+  align-items: center;
+  gap: var(--e-4);
+  width: 100%;
+  min-height: 68px;
+  padding: var(--e-2) var(--e-3);
+  border: 0;
+  border-radius: var(--radio-m);
+  background: transparent;
+  text-align: left;
+  transition: background-color 160ms ease, transform 160ms var(--ease-out);
+
+  &:active {
+    transform: scale(0.99);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background: var(--relleno-suave);
+
+      .contacto__flecha {
+        transform: translateX(3px);
+        opacity: 1;
+      }
+    }
+  }
+}
+
+li + li .contacto {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 72px;
+    right: var(--e-3);
+    height: 0.5px;
+    background: var(--separador);
+  }
+}
+
+.contacto--activo {
+  background: var(--azul-velo) !important;
+
+  .contacto__nombre {
+    color: var(--azul);
+  }
+}
+
+.contacto--baja {
+  opacity: 0.55;
+}
+
+.contacto__texto {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.contacto__nombre {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contacto__cargo {
+  font-size: var(--t-xs);
+  color: var(--texto-2);
+}
+
+.contacto__baja {
+  color: var(--rojo);
+  font-weight: 600;
+}
+
+.contacto__sedes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px;
+  max-width: 45%;
+}
+
+.chip--alerta {
+  background: var(--rojo-velo);
+  color: var(--rojo);
+}
+
+.contacto__flecha {
+  color: var(--texto-3);
+  opacity: 0.6;
+  transition: transform 260ms var(--resorte), opacity 200ms ease;
+}
+
+.vacio {
+  padding: var(--e-6);
+  text-align: center;
+  color: var(--texto-2);
+}
+
+// ---------- Panel del agente: hoja que entra desde la derecha ----------
+.panel {
+  position: sticky;
+  top: 88px;
+  max-height: calc(100dvh - 112px);
+  padding: var(--e-5);
+  overflow-y: auto;
+  box-shadow: var(--sombra-2);
+  transition: opacity 320ms var(--ease-out), transform 460ms var(--resorte);
+
+  @starting-style {
+    opacity: 0;
+    transform: translateX(32px) scale(0.98);
+  }
+}
+
+@media (max-width: 1200px) {
+  .pagina--con-editor {
+    grid-template-columns: 1fr;
+  }
+
+  .panel {
+    position: static;
+    max-height: none;
+    order: -1;
+  }
+
+  .contacto__sedes {
+    display: none;
+  }
+}

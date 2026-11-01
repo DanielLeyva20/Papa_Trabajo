@@ -1,0 +1,359 @@
+// Cuadrícula del mes: columnas fijas; solo cambia la marca dentro de cada casillero.
+
+:host {
+  display: block;
+  --ancho-agente: 248px;
+  --ancho-dia-min: 34px;
+  --alto-fila: 52px;
+}
+
+@media (max-width: 600px) {
+  :host {
+    --ancho-agente: 158px;
+    --alto-fila: 62px;
+  }
+
+  .agente {
+    padding: 0 var(--e-2) !important;
+  }
+
+  .agente__contenido app-avatar {
+    display: none;
+  }
+
+  .agente__nombre {
+    font-size: var(--t-xs) !important;
+  }
+}
+
+.marco {
+  overflow-x: auto;
+  border-radius: var(--radio-l);
+  border: 0.5px solid var(--separador-fuerte);
+  background: var(--superficie);
+}
+
+.tabla {
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  width: 100%;
+  min-width: calc(var(--ancho-agente) + var(--ancho-dia-min) * 31);
+  user-select: none;
+  touch-action: none;
+}
+
+.col-agente {
+  width: var(--ancho-agente);
+}
+
+// ---------- Columna de agentes (fija al desplazar) ----------
+.agente {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  height: var(--alto-fila);
+  padding: 0 var(--e-3);
+  background: var(--superficie);
+  border-right: 0.5px solid var(--separador-fuerte);
+  border-bottom: 0.5px solid var(--separador);
+  text-align: left;
+  font-weight: 400;
+  transition: background-color 160ms ease;
+}
+
+.agente__contenido {
+  display: flex;
+  align-items: center;
+  gap: var(--e-3);
+  min-width: 0;
+}
+
+.agente__texto {
+  display: grid;
+  min-width: 0;
+}
+
+.agente__nombre {
+  display: -webkit-box;
+  font-weight: 600;
+  font-size: var(--t-xs);
+  line-height: 1.2;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.agente__cargo {
+  font-size: 0.75rem;
+  color: var(--texto-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.agente--cabecera {
+  z-index: 3;
+  vertical-align: bottom;
+  padding-bottom: 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--texto-2);
+  border-bottom-color: var(--separador-fuerte);
+}
+
+.fila--historial .agente__nombre {
+  color: var(--texto-2);
+}
+
+tbody tr:hover .agente {
+  background: var(--superficie-2);
+}
+
+// ---------- Cabecera de días ----------
+.dia {
+  position: relative;
+  height: 62px;
+  padding: 0;
+  border-bottom: 0.5px solid var(--separador-fuerte);
+  text-align: center;
+  font-weight: 400;
+  line-height: 1;
+  transition: background-color 160ms ease;
+}
+
+.dia__letra {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--texto-2);
+}
+
+.dia__numero {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: var(--t-sm);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  transition: background-color 200ms ease, color 200ms ease, transform 260ms var(--rebote);
+}
+
+// Hoy: número en círculo azul, como en Calendario
+.dia--hoy {
+  .dia__numero {
+    background: var(--azul);
+    color: #fff;
+  }
+
+  .dia__letra {
+    color: var(--azul);
+  }
+}
+
+// Feriados: el único rojo del calendario
+.dia--feriado {
+  .dia__numero,
+  .dia__letra {
+    color: var(--rojo);
+  }
+
+  &.dia--hoy .dia__numero {
+    background: var(--rojo);
+    color: #fff;
+  }
+}
+
+.dia__punto {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  margin-left: -2px;
+  border-radius: 50%;
+  background: var(--rojo);
+}
+
+.dia--columna .dia__numero {
+  transform: scale(1.12);
+}
+
+.dia--columna:not(.dia--hoy) .dia__numero {
+  background: var(--relleno);
+}
+
+// ---------- Casilleros ----------
+.celda {
+  position: relative;
+  height: var(--alto-fila);
+  padding: 0;
+  border-bottom: 0.5px solid var(--separador);
+  border-right: 0.5px solid rgb(60 60 67 / 0.06);
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 120ms ease;
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    z-index: 1;
+    box-shadow: inset 0 0 0 2.5px var(--azul);
+    border-radius: 8px;
+  }
+}
+
+.celda--feriado {
+  background: var(--rojo-velo);
+}
+
+.celda--hoy {
+  background: rgb(0 113 227 / 0.05);
+}
+
+// Columna bajo el puntero
+.celda--columna {
+  background: rgb(118 118 128 / 0.07);
+}
+
+tbody tr:hover .celda {
+  background-color: rgb(118 118 128 / 0.05);
+}
+
+tbody tr:hover .celda--columna {
+  background-color: rgb(0 113 227 / 0.1);
+}
+
+// Mismo agente de turno en otra sede ese día
+.celda--choque::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--rojo);
+  box-shadow: 0 0 0 2px var(--superficie);
+}
+
+.marca {
+  display: inline-grid;
+  place-items: center;
+  width: calc(100% - 6px);
+  max-width: 40px;
+  height: 32px;
+  border-radius: 9px;
+  font-size: var(--t-sm);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 0.5px rgb(0 0 0 / 0.06);
+}
+
+.marca--clara {
+  background: var(--relleno-suave) !important;
+  box-shadow: none;
+}
+
+// Sello puesto con el ratón: aparece con un pequeño rebote (no con el teclado: se repite mucho)
+:host([data-modo='puntero']) .marca {
+  animation: sellar 280ms var(--rebote);
+}
+
+@keyframes sellar {
+  from {
+    opacity: 0.4;
+    transform: scale(0.6);
+  }
+}
+
+// Después de "Llenar mes automático": las marcas caen como una ola, día por día
+:host(.oleada) .marca {
+  animation: ola 620ms var(--resorte) both;
+  animation-delay: calc(var(--d, 0) * 22ms);
+}
+
+@keyframes ola {
+  from {
+    opacity: 0;
+    filter: blur(3px);
+    transform: translateY(-10px) scale(0.85);
+  }
+}
+
+// ---------- Totales ----------
+.total th,
+.total td {
+  height: 46px;
+  border-top: 0.5px solid var(--separador-fuerte);
+  border-bottom: 0;
+  background: var(--superficie-2);
+}
+
+.total--noche th,
+.total--noche td {
+  border-top: 0.5px solid var(--separador);
+}
+
+.agente--total {
+  font-size: var(--t-xs);
+  font-weight: 700;
+}
+
+.total__minimo {
+  margin-left: 6px;
+  font-weight: 500;
+  color: var(--texto-2);
+}
+
+.total__celda {
+  padding: 0;
+  text-align: center;
+}
+
+.total__valor {
+  display: inline-grid;
+  place-items: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 4px;
+  border-radius: var(--pildora);
+  font-size: var(--t-xs);
+  font-weight: 700;
+  transition: background-color 240ms ease, color 240ms ease, transform 300ms var(--rebote);
+}
+
+// Día a medio llenar: número sin relleno, solo con contorno fino (no se juzga todavía)
+.total__valor--pendiente {
+  color: var(--texto-2);
+  font-weight: 500;
+  box-shadow: inset 0 0 0 1px var(--separador-fuerte);
+}
+
+// Día completo y en regla: número en pastilla llena
+.total__valor:not(.total__valor--pendiente):not(.total__valor--falta):not(.total__valor--noche) {
+  background: var(--relleno-suave);
+}
+
+.total__valor--falta {
+  background: var(--rojo);
+  color: #fff;
+  transform: scale(1.08);
+}
+
+.total__valor--noche {
+  color: var(--indigo);
+}
+
+.vacio {
+  padding: var(--e-6);
+  text-align: center;
+  color: var(--texto-2);
+}

@@ -1,0 +1,114 @@
+<div class="pagina">
+  <header class="cabecera">
+    <div>
+      <h1 class="titulo-grande">Feriados</h1>
+      <p class="texto-secundario">
+        Feriados nacionales del Perú (se calculan solos cada año) y los locales que usted agregue. Solo estos días se
+        ven en rojo en el rol.
+      </p>
+    </div>
+    <div class="anio" role="group" aria-label="Año">
+      <button type="button" class="boton boton--icono" (click)="cambiarAnio(-1)" aria-label="Año anterior">
+        <app-icono nombre="ChevronLeft" [tamano]="20" [trazo]="2.5" />
+      </button>
+      @for (a of [anio()]; track a) {
+        <span class="anio__valor" aria-live="polite">{{ a }}</span>
+      }
+      <button type="button" class="boton boton--icono" (click)="cambiarAnio(1)" aria-label="Año siguiente">
+        <app-icono nombre="ChevronRight" [tamano]="20" [trazo]="2.5" />
+      </button>
+    </div>
+  </header>
+
+  @if (proximo(); as p) {
+    <section class="proximo" [attr.aria-label]="p.faltan === 0 ? 'Feriado de hoy' : 'Próximo feriado'">
+      <div class="proximo__hoja" aria-hidden="true">
+        <span class="proximo__mes">{{ p.mesCorto }}</span>
+        <span class="proximo__dia">{{ p.dia }}</span>
+      </div>
+      <div class="proximo__texto">
+        <h2>{{ p.nombre }}</h2>
+        <p class="proximo__cuando">
+          {{ p.diaSemana }} ·
+          @if (p.faltan === 0) {
+            es hoy
+          } @else if (p.faltan === 1) {
+            es mañana
+          } @else {
+            faltan {{ p.faltan }} días
+          }
+        </p>
+      </div>
+    </section>
+  }
+
+  @if (feriados.isLoading() && !feriados.hasValue()) {
+    <p class="texto-secundario">Cargando feriados…</p>
+  }
+
+  <div class="meses">
+    @for (grupo of porMes(); track grupo.nombre; let g = $index) {
+      <section class="mes tarjeta aparecer" [style.--i]="g">
+        <h2 class="mes__nombre">{{ grupo.nombre }}</h2>
+        <ul>
+          @for (f of grupo.items; track f.fecha) {
+            <li class="feriado" [class.feriado--pasado]="f.pasado">
+              <span class="feriado__fecha">
+                <span class="feriado__mes">{{ f.mesCorto }}</span>
+                <span class="feriado__dia">{{ f.dia }}</span>
+              </span>
+              <span class="feriado__texto">
+                <span class="feriado__nombre">{{ f.nombre }}</span>
+                <span class="feriado__detalle">
+                  {{ f.diaSemana }} · {{ f.tipo === 'NACIONAL' ? 'Nacional' : 'Local' }}
+                </span>
+              </span>
+              @if (f.tipo === 'LOCAL') {
+                <button type="button" class="boton boton--icono quitar" (click)="quitar(f)" [attr.aria-label]="'Quitar ' + f.nombre">
+                  <app-icono nombre="Trash2" [tamano]="17" />
+                </button>
+              }
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  </div>
+
+  <section aria-labelledby="agregar-titulo">
+    <h2 id="agregar-titulo" class="grupo__titulo">Agregar feriado local</h2>
+    <form class="agregar tarjeta" (submit)="agregar($event)">
+      <label class="campo">
+        <span>Fecha</span>
+        <input
+          class="entrada"
+          type="date"
+          [value]="nueva().fecha"
+          (input)="nueva.update((n) => ({ ...n, fecha: $any($event.target).value }))"
+          required
+        />
+      </label>
+      <label class="campo">
+        <span>Nombre</span>
+        <input
+          class="entrada"
+          maxlength="80"
+          placeholder="Ej.: Aniversario de la provincia de Cañete"
+          [value]="nueva().nombre"
+          (input)="nueva.update((n) => ({ ...n, nombre: $any($event.target).value }))"
+          required
+        />
+      </label>
+      <button type="submit" class="boton boton--primario" [disabled]="!nueva().fecha || !nueva().nombre.trim()">
+        <app-icono nombre="Plus" [tamano]="18" />
+        Agregar
+      </button>
+    </form>
+    <p class="grupo__pie">
+      Use esto para feriados regionales, de Cañete o días no laborables decretados.
+      @if (cuentaLocales()) {
+        Este año tiene {{ cuentaLocales() }} {{ cuentaLocales() === 1 ? 'feriado local' : 'feriados locales' }}.
+      }
+    </p>
+  </section>
+</div>

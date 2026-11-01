@@ -1,0 +1,56 @@
+<div class="fondo" aria-hidden="true">
+  <span class="mancha mancha--1"></span>
+  <span class="mancha mancha--2"></span>
+  <span class="mancha mancha--3"></span>
+</div>
+
+<main class="bloqueo" [attr.data-estado]="estado()">
+  <img class="bloqueo__icono" src="favicon.svg" alt="" width="76" height="76" />
+  <h1 class="bloqueo__titulo">Rol de Turnos</h1>
+  <p class="bloqueo__entidad">Distrito Fiscal de Cañete</p>
+
+  <p class="bloqueo__indicacion" id="pin-indicacion">
+    @switch (estado()) {
+      @case ('verificando') {
+        Verificando…
+      }
+      @case ('correcto') {
+        Bienvenido
+      }
+      @default {
+        Ingrese su PIN
+      }
+    }
+  </p>
+
+  <div class="puntos" role="img" [attr.aria-label]="digitos().length + ' de 6 dígitos escritos'">
+    @for (i of puntos; track i) {
+      <span class="punto" [class.punto--lleno]="i < digitos().length" [style.--i]="i"></span>
+    }
+  </div>
+
+  <p class="bloqueo__mensaje" role="alert" aria-live="assertive">
+    @if (despertando()) {
+      Conectando con el servidor… puede tardar hasta un minuto la primera vez del día.
+    } @else {
+      {{ mensaje() }}
+    }
+  </p>
+
+  <div class="teclado" role="group" aria-labelledby="pin-indicacion">
+    @for (t of teclas; track t) {
+      <button type="button" class="tecla" [disabled]="bloqueado()" (click)="pulsar(t)">{{ t }}</button>
+    }
+    <span class="tecla tecla--vacia" aria-hidden="true"></span>
+    <button type="button" class="tecla" [disabled]="bloqueado()" (click)="pulsar('0')">0</button>
+    <button
+      type="button"
+      class="tecla tecla--borrar"
+      [disabled]="bloqueado() || digitos().length === 0"
+      (click)="borrar()"
+      aria-label="Borrar el último dígito"
+    >
+      <app-icono nombre="Delete" [tamano]="26" [trazo]="1.75" />
+    </button>
+  </div>
+</main>

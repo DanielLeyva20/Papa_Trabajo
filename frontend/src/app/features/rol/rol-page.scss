@@ -1,0 +1,382 @@
+:host {
+  display: block;
+  --alto-dock: 76px; // los avisos flotan por encima del Dock
+}
+
+.pagina {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--e-5);
+  max-width: 1760px;
+  margin: 0 auto;
+}
+
+// ---------- Cabecera: título grande del mes ----------
+.cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--e-4) var(--e-6);
+}
+
+.mes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-3) var(--e-5);
+}
+
+.mes__titulo {
+  min-width: 8ch;
+  animation: rodar 460ms var(--resorte);
+}
+
+.mes__titulo[data-dir='-1'] {
+  --desde: -16px;
+}
+
+@keyframes rodar {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(var(--desde, 16px));
+  }
+}
+
+.mes__anio {
+  color: var(--texto-3);
+  font-weight: 600;
+}
+
+.mes__flechas {
+  display: flex;
+  gap: var(--e-2);
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-2);
+}
+
+// Brillo que recorre el botón principal al pasar el puntero
+.boton--brillo {
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 30%, rgb(255 255 255 / 0.35) 50%, transparent 70%);
+    transform: translateX(-120%);
+    transition: transform 700ms var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover::after {
+      transform: translateX(120%);
+    }
+  }
+}
+
+// ---------- Sedes: control segmentado ----------
+.centinela {
+  display: block;
+  height: 1px;
+  margin-top: calc(var(--e-5) * -1);
+}
+
+.sedes {
+  display: flex;
+  align-items: center;
+  gap: var(--e-4);
+  overflow-x: auto;
+  padding: 2px;
+  margin: -2px;
+}
+
+// Al bajar: barra de vidrio fija bajo la barra principal, con el mes a la izquierda
+@media (min-width: 1181px) {
+  .sedes {
+    position: sticky;
+    top: 64px;
+    z-index: 20;
+    padding: 8px 10px;
+    margin: -8px -10px;
+    border-radius: var(--radio-l);
+    transition: background-color 260ms ease, box-shadow 260ms ease;
+  }
+
+  .sedes--fija {
+    background: rgb(245 245 247 / 0.86);
+    backdrop-filter: blur(20px) saturate(180%);
+    box-shadow: 0 8px 24px -14px rgb(0 0 0 / 0.3), inset 0 0 0 0.5px var(--separador);
+  }
+}
+
+// El mes aparece (solo opacidad y desplazamiento) cuando la barra queda fija
+.sedes__mes {
+  display: none;
+  flex: none;
+  white-space: nowrap;
+  font-size: var(--t-md);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.sedes--fija .sedes__mes {
+  display: block;
+  animation: asomar 420ms var(--resorte);
+}
+
+@keyframes asomar {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.sedes__control {
+  min-width: max-content;
+}
+
+.sedes__alerta {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--rojo);
+  animation: latido 2.4s ease-in-out infinite;
+}
+
+@keyframes latido {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(215 0 21 / 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgb(215 0 21 / 0);
+  }
+}
+
+// ---------- Feriados del mes ----------
+.feriados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.feriado {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+  min-height: 34px;
+  padding: 0 14px 0 4px;
+  border-radius: var(--pildora);
+  background: var(--rojo-velo);
+  color: var(--rojo);
+  font-size: var(--t-xs);
+  font-weight: 600;
+}
+
+.feriado__dia {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--rojo);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+// ---------- Avisos ----------
+.aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--e-3);
+  padding: var(--e-4) var(--e-5);
+  border-radius: var(--radio-l);
+
+  ul {
+    margin: var(--e-1) 0 0;
+    padding-left: var(--e-5);
+    color: var(--texto);
+  }
+
+  p {
+    margin-top: var(--e-1);
+    max-width: 70ch;
+    color: var(--texto-2);
+  }
+}
+
+.aviso--alerta {
+  background: var(--rojo-velo);
+  color: var(--rojo);
+}
+
+.aviso__icono {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgb(215 0 21 / 0.12);
+}
+
+.sin-conexion {
+  align-items: center;
+
+  > div {
+    flex: 1;
+  }
+}
+
+// ---------- Mes en blanco ----------
+.en-blanco {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-4) var(--e-5);
+  padding: var(--e-5) var(--e-6);
+
+  > div {
+    flex: 1 1 360px;
+  }
+
+  h2 {
+    font-size: var(--t-lg);
+  }
+
+  p {
+    max-width: 62ch;
+    margin-top: var(--e-1);
+    color: var(--texto-2);
+  }
+}
+
+.en-blanco__icono {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--azul-velo);
+  color: var(--azul);
+  animation: flotar 3.2s ease-in-out infinite;
+}
+
+@keyframes flotar {
+  50% {
+    transform: translateY(-4px) rotate(-4deg);
+  }
+}
+
+// ---------- Esqueleto de carga ----------
+.esqueleto {
+  display: grid;
+  gap: var(--e-3);
+  padding: var(--e-5);
+}
+
+.esqueleto__linea {
+  height: 44px;
+  border-radius: var(--radio-m);
+  background: linear-gradient(90deg, var(--relleno-suave) 25%, rgb(118 118 128 / 0.14) 50%, var(--relleno-suave) 75%);
+  background-size: 300% 100%;
+  animation: brillo 1.4s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 80ms);
+}
+
+@keyframes brillo {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+// ---------- Hojas por sede ----------
+.hojas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--e-5);
+  transition: opacity 200ms ease, filter 200ms ease;
+}
+
+.hojas--cargando {
+  opacity: 0.55;
+}
+
+// Al cambiar de mes, la vista anterior se desvanece hacia el lado que se dejó
+.hojas--saliendo {
+  opacity: 0;
+  filter: blur(6px);
+  transform: translateX(-24px);
+  transition: opacity 200ms var(--ease-out), filter 200ms var(--ease-out), transform 260ms var(--resorte);
+}
+
+.hojas[data-dir='-1'].hojas--saliendo {
+  transform: translateX(24px);
+}
+
+.sede {
+  padding: var(--e-4) var(--e-4) var(--e-4);
+}
+
+.sede__cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-4);
+  padding: var(--e-1) var(--e-2) var(--e-3);
+}
+
+.sede__nombre {
+  font-size: var(--t-lg);
+  font-weight: 700;
+}
+
+.ayuda {
+  text-align: center;
+  font-size: var(--t-xs);
+  color: var(--texto-2);
+
+  kbd {
+    display: inline-block;
+    min-width: 22px;
+    padding: 1px 6px;
+    border-radius: 6px;
+    background: var(--superficie);
+    box-shadow: 0 1px 0 var(--separador-fuerte), inset 0 0 0 0.5px var(--separador-fuerte);
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+}
+
+@media (max-width: 900px) {
+  .acciones {
+    width: 100%;
+
+    .boton--primario {
+      flex: 1 1 100%;
+    }
+  }
+
+  .sede {
+    padding: var(--e-2);
+  }
+}

@@ -1,0 +1,148 @@
+<div class="pagina">
+  <header class="cabecera">
+    <div>
+      <h1 class="titulo-grande">Sedes</h1>
+      <p class="texto-secundario">El orden de esta lista es el orden del rol, del Excel y del PDF.</p>
+    </div>
+    <app-selector-mes />
+  </header>
+
+  <section aria-labelledby="sedes-titulo">
+    <h2 id="sedes-titulo" class="grupo__titulo">Sedes y mínimo de agentes de día</h2>
+    <ol class="grupo tarjeta">
+      @for (sede of store.sedes(); track sede.id; let i = $index; let ultimo = $last) {
+        <li class="sede aparecer" [style.--i]="i" [class.sede--inactiva]="!sede.activa">
+          <div class="sede__fila">
+            <span class="sede__numero">{{ i + 1 }}</span>
+
+            @if (editando() === sede.id) {
+              <form class="sede__form" (submit)="guardar(sede, $event)">
+                <label class="campo">
+                  <span>Nombre oficial</span>
+                  <input class="entrada" [value]="borrador().nombre"
+                    (input)="borrador.update(b => ({ ...b, nombre: $any($event.target).value }))" />
+                </label>
+                <label class="campo campo--corto">
+                  <span>Nombre corto (pestaña)</span>
+                  <input class="entrada" maxlength="24" [value]="borrador().nombreCorto"
+                    (input)="borrador.update(b => ({ ...b, nombreCorto: $any($event.target).value }))" />
+                </label>
+                <div class="sede__form-acciones">
+                  <button type="button" class="boton" (click)="editando.set(null)">Cancelar</button>
+                  <button type="submit" class="boton boton--primario">Guardar</button>
+                </div>
+              </form>
+            } @else {
+              <button type="button" class="sede__titulo" (click)="store.alternar(sede.id)"
+                [attr.aria-expanded]="store.abierta() === sede.id">
+                <span class="sede__nombre">{{ sede.nombre }}</span>
+                <span class="sede__corto">
+                  {{ sede.nombreCorto }}
+                  @if (!sede.activa) {
+                    · <strong>oculta</strong>
+                  }
+                </span>
+              </button>
+
+              <div class="paso" role="group" [attr.aria-label]="'Mínimo de agentes de día en ' + sede.nombreCorto">
+                <span class="paso__rotulo">Mín. de día</span>
+                <div class="paso__control">
+                  <button type="button" [disabled]="sede.minimoDia === 0" (click)="store.cambiarMinimo(sede, -1)" aria-label="Uno menos">
+                    <app-icono nombre="Minus" [tamano]="16" [trazo]="2.5" />
+                  </button>
+                  @for (v of [sede.minimoDia]; track v) {
+                    <span class="paso__valor" aria-live="polite">{{ v }}</span>
+                  }
+                  <button type="button" (click)="store.cambiarMinimo(sede, 1)" aria-label="Uno más">
+                    <app-icono nombre="Plus" [tamano]="16" [trazo]="2.5" />
+                  </button>
+                </div>
+              </div>
+
+              <div class="sede__acciones">
+                <button type="button" class="boton boton--icono" [disabled]="i === 0"
+                  (click)="store.mover(i, -1)" aria-label="Subir en la lista">
+                  <app-icono nombre="ArrowUp" [tamano]="18" />
+                </button>
+                <button type="button" class="boton boton--icono" [disabled]="ultimo"
+                  (click)="store.mover(i, 1)" aria-label="Bajar en la lista">
+                  <app-icono nombre="ArrowDown" [tamano]="18" />
+                </button>
+                <button type="button" class="boton boton--plano" (click)="editar(sede)">Editar</button>
+                <button type="button" class="boton boton--plano" (click)="store.actualizar(sede, { activa: !sede.activa })">
+                  {{ sede.activa ? 'Ocultar' : 'Mostrar' }}
+                </button>
+              </div>
+            }
+          </div>
+
+          @if (store.abierta() === sede.id) {
+            <div class="agentes">
+              <p class="agentes__nota">Orden de los agentes en {{ store.mes.nombre() }}</p>
+              <ol>
+                @for (a of store.agentes(); track a.id; let j = $index; let fin = $last) {
+                  <li class="agente aparecer" [style.--i]="j">
+                    <span class="agente__nombre">{{ a.nombres }}</span>
+                    <span class="agente__cargo">{{ etiquetaCargo[a.cargo] }}</span>
+                    <button type="button" class="boton boton--icono boton--chico" [disabled]="j === 0"
+                      (click)="store.moverAgente(j, -1)" [attr.aria-label]="'Subir a ' + a.nombres">
+                      <app-icono nombre="ArrowUp" [tamano]="16" />
+                    </button>
+                    <button type="button" class="boton boton--icono boton--chico" [disabled]="fin"
+                      (click)="store.moverAgente(j, 1)" [attr.aria-label]="'Bajar a ' + a.nombres">
+                      <app-icono nombre="ArrowDown" [tamano]="16" />
+                    </button>
+                  </li>
+                } @empty {
+                  <li class="agentes__vacio">Sin agentes este mes. Asígnelos desde Personal.</li>
+                }
+              </ol>
+            </div>
+          }
+        </li>
+      }
+    </ol>
+    <p class="grupo__pie">
+      Si un día completo tiene menos agentes de día que el mínimo, el TOTAL DÍA se pinta de rojo.
+    </p>
+  </section>
+
+  <section aria-labelledby="nueva-titulo">
+    <h2 id="nueva-titulo" class="grupo__titulo">Agregar sede</h2>
+    <form class="grupo tarjeta nueva" (submit)="crear($event)">
+      <label class="campo">
+        <span>Nombre oficial</span>
+        <input class="entrada" placeholder="Ej.: Fiscalía Provincial de Lunahuaná" [value]="nueva().nombre"
+          (input)="nueva.update(n => ({ ...n, nombre: $any($event.target).value }))" />
+      </label>
+      <label class="campo">
+        <span>Nombre corto</span>
+        <input class="entrada" maxlength="24" placeholder="Ej.: Lunahuaná" [value]="nueva().nombreCorto"
+          (input)="nueva.update(n => ({ ...n, nombreCorto: $any($event.target).value }))" />
+      </label>
+      <button type="submit" class="boton boton--primario" [disabled]="!nueva().nombre.trim() || !nueva().nombreCorto.trim()">
+        <app-icono nombre="Plus" [tamano]="18" />
+        Agregar sede
+      </button>
+    </form>
+  </section>
+
+  @if (store.configuracion(); as config) {
+    <section aria-labelledby="encabezado-titulo">
+      <h2 id="encabezado-titulo" class="grupo__titulo">Encabezado de los documentos</h2>
+      <form #formEncabezado class="grupo tarjeta encabezado" (submit)="guardarEncabezado($event, formEncabezado)">
+        <label class="campo">
+          <span>Entidad</span>
+          <input class="entrada" name="entidad" [value]="config.entidad" required />
+        </label>
+        <label class="campo">
+          <span>Supervisor que firma</span>
+          <input class="entrada" name="supervisor" [value]="config.supervisor" required />
+        </label>
+        <input type="hidden" name="titulo" [value]="config.titulo" />
+        <button type="submit" class="boton boton--oscuro">Guardar encabezado</button>
+      </form>
+      <p class="grupo__pie">Aparece en la parte superior del Excel y del PDF, y en la firma.</p>
+    </section>
+  }
+</div>

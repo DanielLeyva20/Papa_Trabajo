@@ -1,0 +1,301 @@
+// Pantalla de bloqueo: fondo de color vivo en movimiento lento + tarjeta de vidrio con teclado numérico.
+
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #0b1a3a;
+  color: #fff;
+}
+
+// ---------- Fondo: manchas de color difuminadas que derivan despacio ----------
+.fondo {
+  position: absolute;
+  inset: -20%;
+  filter: blur(70px) saturate(140%);
+}
+
+.mancha {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.85;
+  animation: derivar 22s ease-in-out infinite alternate;
+}
+
+.mancha--1 {
+  top: 5%;
+  left: 10%;
+  width: 55vmax;
+  height: 55vmax;
+  background: #0071e3;
+}
+
+.mancha--2 {
+  right: 0;
+  bottom: 0;
+  width: 50vmax;
+  height: 50vmax;
+  background: #5856d6;
+  animation-duration: 28s;
+  animation-direction: alternate-reverse;
+}
+
+.mancha--3 {
+  top: 40%;
+  left: 40%;
+  width: 35vmax;
+  height: 35vmax;
+  background: #30b0c7;
+  animation-duration: 18s;
+}
+
+@keyframes derivar {
+  to {
+    transform: translate(12vmax, -8vmax) scale(1.15);
+  }
+}
+
+// ---------- Tarjeta de vidrio ----------
+.bloqueo {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  width: min(400px, calc(100vw - 32px));
+  padding: var(--e-6) var(--e-5) var(--e-5);
+  border-radius: 34px;
+  background: rgb(255 255 255 / 0.12);
+  backdrop-filter: blur(30px) saturate(160%);
+  border: 0.5px solid rgb(255 255 255 / 0.28);
+  box-shadow: 0 30px 80px -20px rgb(0 0 0 / 0.45), inset 0 0.5px 0 rgb(255 255 255 / 0.5);
+  animation: llegar 700ms var(--resorte) both;
+  transition: transform 600ms var(--resorte), opacity 500ms ease, filter 500ms ease;
+}
+
+@keyframes llegar {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(24px) scale(0.96);
+  }
+}
+
+// Al acertar, la tarjeta se "abre" hacia el sistema
+.bloqueo[data-estado='correcto'] {
+  transform: scale(1.06);
+  opacity: 0;
+  filter: blur(8px);
+  transition-delay: 250ms;
+}
+
+.bloqueo__icono {
+  border-radius: 18px;
+  box-shadow: 0 12px 30px -8px rgb(0 0 0 / 0.5);
+  animation: flotar 5s ease-in-out infinite;
+}
+
+@keyframes flotar {
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.bloqueo__titulo {
+  margin-top: var(--e-4);
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.bloqueo__entidad {
+  font-size: var(--t-xs);
+  color: rgb(255 255 255 / 0.78);
+}
+
+.bloqueo__indicacion {
+  margin-top: var(--e-5);
+  font-size: var(--t-md);
+  font-weight: 600;
+}
+
+// ---------- Puntos del PIN ----------
+.puntos {
+  display: flex;
+  gap: 16px;
+  margin-top: var(--e-4);
+}
+
+.punto {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1.75px solid rgb(255 255 255 / 0.9);
+  transition: background-color 160ms ease, transform 260ms var(--rebote), border-color 200ms ease;
+}
+
+.punto--lleno {
+  background: #fff;
+  transform: scale(1.1);
+}
+
+[data-estado='verificando'] .punto {
+  animation: latir 900ms ease-in-out infinite;
+  animation-delay: calc(var(--i) * 90ms);
+}
+
+@keyframes latir {
+  50% {
+    opacity: 0.4;
+    transform: scale(0.85);
+  }
+}
+
+[data-estado='error'] .puntos,
+[data-estado='bloqueado'] .puntos {
+  animation: sacudir 480ms var(--ease-out);
+}
+
+[data-estado='error'] .punto,
+[data-estado='bloqueado'] .punto {
+  border-color: #ff6961;
+}
+
+[data-estado='correcto'] .punto {
+  background: #30d158;
+  border-color: #30d158;
+  transform: scale(1.2);
+  transition-delay: calc(var(--i) * 40ms);
+}
+
+@keyframes sacudir {
+  15%,
+  55% {
+    transform: translateX(-12px);
+  }
+  35%,
+  75% {
+    transform: translateX(12px);
+  }
+}
+
+.bloqueo__mensaje {
+  display: grid;
+  place-items: center;
+  min-height: 2.8em;
+  max-width: 32ch;
+  margin-top: var(--e-3);
+  text-align: center;
+  font-size: var(--t-xs);
+  font-weight: 600;
+  color: #fff;
+}
+
+// Error legible sobre cualquier parte del fondo: texto blanco sobre pastilla roja
+[data-estado='error'] .bloqueo__mensaje,
+[data-estado='bloqueado'] .bloqueo__mensaje {
+  padding: 6px 14px;
+  border-radius: var(--pildora);
+  background: rgb(215 0 21 / 0.88);
+  animation: aparecer-mensaje 300ms var(--resorte);
+}
+
+@keyframes aparecer-mensaje {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+
+// ---------- Teclado numérico ----------
+.teclado {
+  display: grid;
+  grid-template-columns: repeat(3, 76px);
+  gap: 16px 24px;
+  margin-top: var(--e-2);
+}
+
+.tecla {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.16);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  transition: background-color 120ms ease, transform 160ms var(--ease-out);
+
+  &:active:not(:disabled) {
+    background: rgb(255 255 255 / 0.42);
+    transform: scale(0.94);
+    transition-duration: 40ms;
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.5;
+  }
+
+  &:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 3px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover:not(:disabled) {
+      background: rgb(255 255 255 / 0.24);
+    }
+  }
+}
+
+.tecla--vacia {
+  background: none;
+  backdrop-filter: none;
+}
+
+.tecla--borrar {
+  background: none;
+  backdrop-filter: none;
+}
+
+@media (max-height: 700px) {
+  .bloqueo {
+    padding-top: var(--e-4);
+  }
+
+  .bloqueo__icono {
+    width: 56px;
+    height: 56px;
+  }
+
+  .teclado {
+    grid-template-columns: repeat(3, 66px);
+    gap: 10px 20px;
+  }
+
+  .tecla {
+    width: 66px;
+    height: 66px;
+    font-size: 1.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mancha,
+  .bloqueo__icono {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .bloqueo {
+    background: rgb(20 40 90 / 0.92);
+    backdrop-filter: none;
+  }
+}

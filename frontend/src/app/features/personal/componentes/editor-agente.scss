@@ -1,0 +1,229 @@
+.editor {
+  position: relative;
+  display: grid;
+  gap: var(--e-5);
+}
+
+.editor__cerrar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 34px;
+  min-height: 34px;
+}
+
+// ---------- Perfil con foto ----------
+.perfil {
+  display: grid;
+  justify-items: center;
+  gap: var(--e-1);
+  padding-top: var(--e-2);
+  text-align: center;
+}
+
+.perfil__foto {
+  position: relative;
+  width: 112px;
+  height: 112px;
+  margin-bottom: var(--e-3);
+  border-radius: 50%;
+  transition: transform 360ms var(--rebote), box-shadow 240ms ease;
+
+  app-avatar,
+  .perfil__previa {
+    box-shadow: 0 10px 30px -10px rgb(0 0 0 / 0.35);
+  }
+}
+
+.perfil__previa {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  object-fit: cover;
+  animation: revelar 420ms var(--resorte);
+}
+
+@keyframes revelar {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+}
+
+// Al arrastrar una foto encima, el círculo "respira" invitando a soltarla
+.perfil__foto--arrastrando {
+  transform: scale(1.08);
+  box-shadow: 0 0 0 4px var(--superficie), 0 0 0 7px var(--azul);
+}
+
+// Mientras se sube: anillo giratorio
+.perfil__foto--subiendo::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 3px solid var(--azul-velo);
+  border-top-color: var(--azul);
+  animation: girar 800ms linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.perfil__camara {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--superficie);
+  border-radius: 50%;
+  background: var(--azul);
+  color: #fff;
+  box-shadow: 0 4px 12px -2px rgb(0 113 227 / 0.55);
+  transition: transform 260ms var(--rebote);
+
+  &:active {
+    transform: scale(0.9);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      transform: scale(1.1) rotate(-8deg);
+    }
+  }
+}
+
+.perfil__nombre {
+  max-width: 100%;
+  font-size: var(--t-xl);
+  font-weight: 700;
+  letter-spacing: -0.028em;
+  overflow-wrap: anywhere;
+}
+
+.perfil__cargo {
+  color: var(--texto-2);
+}
+
+.perfil__acciones {
+  display: flex;
+  gap: var(--e-1);
+  margin-top: var(--e-2);
+
+  .boton {
+    min-height: 36px;
+    padding: 0 var(--e-3);
+  }
+}
+
+.perfil__pista {
+  font-size: 0.75rem;
+  color: var(--texto-3);
+}
+
+.boton--quitar {
+  color: var(--rojo);
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover:not(:disabled) {
+      background: var(--rojo-velo);
+    }
+  }
+}
+
+// ---------- Grupos (como Ajustes de iOS) ----------
+.grupo {
+  padding: var(--e-4);
+  border-radius: var(--radio-l);
+  background: var(--relleno-suave);
+}
+
+.datos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--e-3) var(--e-4);
+}
+
+.campo--ancho {
+  grid-column: 1 / -1;
+}
+
+.datos__acciones {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+.sedes {
+  display: grid;
+  gap: var(--e-3);
+
+  h3 {
+    font-size: var(--t-lg);
+    font-weight: 700;
+  }
+}
+
+.nota {
+  max-width: 65ch;
+  margin-top: var(--e-1);
+  font-size: var(--t-xs);
+  color: var(--texto-2);
+}
+
+.asignacion__cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-3);
+  margin-bottom: var(--e-3);
+
+  h4 {
+    margin: 0;
+    font-size: var(--t-sm);
+    font-weight: 650;
+  }
+
+  .boton {
+    min-height: 32px;
+    padding: 0 var(--e-3);
+    font-size: var(--t-xs);
+  }
+}
+
+.sin-sedes {
+  padding: var(--e-4);
+  border-radius: var(--radio-l);
+  border: 1.5px dashed var(--separador-fuerte);
+  color: var(--texto-2);
+  text-align: center;
+}
+
+.agregar {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--e-3);
+
+  .campo {
+    flex: 1;
+  }
+}
+
+.editor__pie {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--e-4);
+  border-top: 0.5px solid var(--separador);
+}
+
+@media (max-width: 640px) {
+  .datos {
+    grid-template-columns: 1fr;
+  }
+}

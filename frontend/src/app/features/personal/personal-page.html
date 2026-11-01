@@ -1,0 +1,90 @@
+<div class="pagina" [class.pagina--con-editor]="store.seleccion() !== null">
+  <section class="lista" aria-labelledby="personal-titulo">
+    <header class="lista__cabecera">
+      <div>
+        <h1 id="personal-titulo" class="titulo-grande">Personal</h1>
+        <p class="texto-secundario">{{ store.filtrados().length }} agentes · sedes de {{ store.mes.nombre() }}</p>
+      </div>
+      <div class="lista__herramientas">
+        <app-selector-mes />
+        <button type="button" class="boton boton--primario" (click)="store.seleccionar('nuevo')">
+          <app-icono nombre="UserPlus" [tamano]="18" />
+          Agregar agente
+        </button>
+      </div>
+    </header>
+
+    <div class="lista__barra">
+      <label class="buscar">
+        <app-icono nombre="Search" [tamano]="18" />
+        <span class="solo-lectores">Buscar agente</span>
+        <input
+          class="entrada"
+          type="search"
+          placeholder="Buscar por nombre o sede"
+          [value]="store.busqueda()"
+          (input)="store.busqueda.set($any($event.target).value)"
+        />
+      </label>
+      <label class="interruptor">
+        <input
+          type="checkbox"
+          role="switch"
+          [checked]="store.verBajas()"
+          (change)="store.verBajas.set($any($event.target).checked)"
+        />
+        <span class="interruptor__pista" aria-hidden="true"></span>
+        Ver dados de baja
+      </label>
+    </div>
+
+    <ul class="contactos tarjeta">
+      @for (agente of store.filtrados(); track agente.id; let i = $index) {
+        <li class="aparecer" [style.--i]="i < 18 ? i : 18">
+          <button
+            type="button"
+            class="contacto"
+            [class.contacto--activo]="store.seleccion() === agente.id"
+            [class.contacto--baja]="!agente.activo"
+            (click)="store.seleccionar(agente.id)"
+          >
+            <app-avatar [agenteId]="agente.id" [nombres]="agente.nombres" [fotoVersion]="agente.fotoVersion" [tamano]="44" />
+            <span class="contacto__texto">
+              <span class="contacto__nombre">{{ agente.nombres }}</span>
+              <span class="contacto__cargo">
+                {{ etiquetaCargo[agente.cargo] }}
+                @if (!agente.activo) {
+                  · <span class="contacto__baja">De baja</span>
+                }
+              </span>
+            </span>
+            <span class="contacto__sedes">
+              @for (sede of agente.sedes; track sede) {
+                <span class="chip">{{ sede }}</span>
+              } @empty {
+                @if (agente.activo) {
+                  <span class="chip chip--alerta">Sin sede</span>
+                }
+              }
+            </span>
+            <app-icono class="contacto__flecha" nombre="ChevronRight" [tamano]="18" />
+          </button>
+        </li>
+      } @empty {
+        <li class="vacio">
+          @if (store.cargando()) {
+            Cargando…
+          } @else {
+            No se encontró ningún agente con «{{ store.busqueda() }}».
+          }
+        </li>
+      }
+    </ul>
+  </section>
+
+  @if (store.seleccion() !== null) {
+    <aside class="panel tarjeta">
+      <app-editor-agente />
+    </aside>
+  }
+</div>
