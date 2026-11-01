@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
+import { DestroyRef, Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
+import { forkJoin } from 'rxjs';
 import { AgentesApi, AsignacionesApi, SedesApi, type AgenteDatos } from '../../core/api/api';
 import { esDescansero, type Agente, type Asignacion, type Cargo, type PatronSemanal, type Sede } from '../../core/models/dominio';
 import { Avisos } from '../../core/services/avisos';
@@ -57,9 +58,16 @@ export class PersonalStore {
     return this.sedes().filter((s) => s.activa && !ocupadas.has(s.id));
   });
 
-  private readonly patronesPendientes = new Map<number, ReturnType<typeof setTimeout>>();
+  /** Semanas cambiadas que aún no se envían (asignación → semana nueva). */
+  private readonly patronesPendientes = new Map<number, PatronSemanal>();
+  private temporizadorPatrones: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
+    const quitarGuardador = this.indicador.registrar(() => this.guardarPatrones());
+    inject(DestroyRef).onDestroy(() => {
+      quitarGuardador();
+      this.guardarPatrones();
+    });
     this.sedesApi.listar().subscribe((sedes) => this.sedes.set(sedes));
     effect(() => {
       const mes = this.mes.mes();
@@ -197,18 +205,32 @@ export class PersonalStore {
   /** Cambia la semana al instante y la guarda poco después (varios toques = un solo guardado). */
   cambiarPatron(asignacionId: number, patron: PatronSemanal): void {
     this.asignaciones.update((lista) => lista.map((a) => (a.id === asignacionId ? { ...a, patron } : a)));
-    clearTimeout(this.patronesPendientes.get(asignacionId));
+    this.patronesPendientes.set(asignacionId, patron);
+    this.indicador.pendiente();
+    if (this.temporizadorPatrones) clearTimeout(this.temporizadorPatrones);
+    this.temporizadorPatrones = setTimeout(() => this.guardarPatrones(), 600);
+  }
+
+  /** Envía ya las semanas pendientes (lo usa también «Guardar cambios»). */
+  guardarPatrones(): void {
+    if (this.temporizadorPatrones) clearTimeout(this.temporizadorPatrones);
+    this.temporizadorPatrones = null;
+    if (this.patronesPendientes.size === 0) return;
+
+    const lote = [...this.patronesPendientes];
+    this.patronesPendientes.clear();
     this.indicador.guardando();
-    this.patronesPendientes.set(
-      asignacionId,
-      setTimeout(() => {
-        this.patronesPendientes.delete(asignacionId);
-        this.asignacionesApi.cambiarPatron(asignacionId, patron).subscribe({
-          next: () => this.indicador.guardado(),
-          error: () => this.indicador.fallo(),
-        });
-      }, 600),
-    );
+    forkJoin(lote.map(([id, patron]) => this.asignacionesApi.cambiarPatron(id, patron))).subscribe({
+      next: () => {
+        this.indicador.guardado();
+        if (this.patronesPendientes.size > 0) this.indicador.pendiente();
+      },
+      error: () => {
+        // Se conservan para reintentar con «Guardar cambios».
+        for (const [id, patron] of lote) if (!this.patronesPendientes.has(id)) this.patronesPendientes.set(id, patron);
+        this.indicador.fallo();
+      },
+    });
   }
 
   retirar(asignacion: Asignacion): void {

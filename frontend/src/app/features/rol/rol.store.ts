@@ -12,7 +12,7 @@ import type {
 } from '../../core/models/dominio';
 import { Avisos } from '../../core/services/avisos';
 import { Catalogo } from '../../core/services/catalogo';
-import { IndicadorGuardado } from '../../core/services/estado-guardado';
+import { ESPERA_AUTOGUARDADO_MS, IndicadorGuardado } from '../../core/services/estado-guardado';
 import { MesSeleccionado } from '../../core/services/mes-seleccionado';
 
 export interface Celda {
@@ -32,7 +32,6 @@ export interface TotalesSede {
 /** Agentes marcados de turno en dos sedes el mismo día → clave `agenteId:índiceDía`. */
 export type MapaConflictos = Map<string, string[]>;
 
-const ESPERA_GUARDADO_MS = 500;
 const MAX_HISTORIAL = 50;
 const CLAVE_SEDE = 'rol-turnos:sede';
 const CLAVE_VISTA = 'rol-turnos:vista';
@@ -233,8 +232,10 @@ export class RolStore {
 
     const alSalir = () => this.guardarAhora();
     window.addEventListener('beforeunload', alSalir);
+    const quitarGuardador = this.indicador.registrar(() => this.guardarAhora());
     inject(DestroyRef).onDestroy(() => {
       window.removeEventListener('beforeunload', alSalir);
+      quitarGuardador();
       this.guardarAhora();
     });
   }
@@ -348,7 +349,8 @@ export class RolStore {
     this.indicador.guardando();
     this.api.guardarMarcas(lote).subscribe({
       next: () => {
-        if (this.pendientes.size === 0) this.indicador.guardado();
+        this.indicador.guardado();
+        if (this.pendientes.size > 0) this.indicador.pendiente(); // se marcó algo más mientras se enviaba
       },
       error: () => {
         // Se conservan para reintentar sin perder lo marcado.
@@ -384,9 +386,10 @@ export class RolStore {
     });
 
     for (const c of cambios) this.pendientes.set(claveCambio(c), c);
-    this.indicador.guardando();
+    this.indicador.pendiente();
+    // Guardado automático de respaldo: si no se pulsa «Guardar cambios», se envía solo al dejar de marcar.
     if (this.temporizador) clearTimeout(this.temporizador);
-    this.temporizador = setTimeout(() => this.guardarAhora(), ESPERA_GUARDADO_MS);
+    this.temporizador = setTimeout(() => this.guardarAhora(), ESPERA_AUTOGUARDADO_MS);
   }
 
   private leerSede(): number | 'todas' {

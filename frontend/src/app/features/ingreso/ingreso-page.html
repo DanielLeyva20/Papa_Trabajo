@@ -1,56 +1,79 @@
-<div class="fondo" aria-hidden="true">
-  <span class="mancha mancha--1"></span>
-  <span class="mancha mancha--2"></span>
-  <span class="mancha mancha--3"></span>
+<!-- Foto del equipo con un velo azul de marca y un barrido de luz lento -->
+<div class="escena" aria-hidden="true">
+  <img class="escena__foto" src="ingreso/fondo.jpeg" alt="" width="1600" height="1200" fetchpriority="high" decoding="async" />
+  <span class="escena__velo"></span>
+  <span class="escena__luz"></span>
 </div>
 
-<main class="bloqueo" [attr.data-estado]="estado()">
-  <img class="bloqueo__icono" src="favicon.svg" alt="" width="76" height="76" />
-  <h1 class="bloqueo__titulo">Rol de Turnos</h1>
-  <p class="bloqueo__entidad">Distrito Fiscal de Cañete</p>
-
-  <p class="bloqueo__indicacion" id="pin-indicacion">
-    @switch (estado()) {
-      @case ('verificando') {
-        Verificando…
-      }
-      @case ('correcto') {
-        Bienvenido
-      }
-      @default {
-        Ingrese su PIN
-      }
-    }
-  </p>
-
-  <div class="puntos" role="img" [attr.aria-label]="digitos().length + ' de 6 dígitos escritos'">
-    @for (i of puntos; track i) {
-      <span class="punto" [class.punto--lleno]="i < digitos().length" [style.--i]="i"></span>
-    }
+<main class="acceso" [class.acceso--entrando]="entrando()" [attr.data-estado]="estado()">
+  <div class="logos">
+    <img class="logo" src="ingreso/logo1.jpeg" alt="ROCER Seguridad y Vigilancia" width="290" height="378" />
+    <img class="logo" src="ingreso/logo2.jpeg" alt="PRO-SERVIS, servimos con excelencia" width="306" height="344" />
   </div>
 
-  <p class="bloqueo__mensaje" role="alert" aria-live="assertive">
-    @if (despertando()) {
-      Conectando con el servidor… puede tardar hasta un minuto la primera vez del día.
-    } @else {
-      {{ mensaje() }}
-    }
-  </p>
+  <section class="panel" aria-labelledby="acceso-titulo">
+    <h1 class="panel__titulo" id="acceso-titulo">Rol de Turnos</h1>
+    <p class="panel__entidad">Distrito Fiscal de Cañete</p>
 
-  <div class="teclado" role="group" aria-labelledby="pin-indicacion">
-    @for (t of teclas; track t) {
-      <button type="button" class="tecla" [disabled]="bloqueado()" (click)="pulsar(t)">{{ t }}</button>
-    }
-    <span class="tecla tecla--vacia" aria-hidden="true"></span>
-    <button type="button" class="tecla" [disabled]="bloqueado()" (click)="pulsar('0')">0</button>
-    <button
-      type="button"
-      class="tecla tecla--borrar"
-      [disabled]="bloqueado() || digitos().length === 0"
-      (click)="borrar()"
-      aria-label="Borrar el último dígito"
+    <p class="panel__indicacion" id="pin-indicacion">
+      @switch (estado()) {
+        @case ('verificando') {
+          Verificando…
+        }
+        @case ('correcto') {
+          PIN correcto. Bienvenido
+        }
+        @default {
+          Ingrese su PIN de 6 dígitos
+        }
+      }
+    </p>
+
+    <div
+      class="casilleros"
+      role="img"
+      [attr.aria-label]="digitos().length + ' de 6 dígitos escritos'"
+      [attr.data-estado]="estado()"
     >
-      <app-icono nombre="Delete" [tamano]="26" [trazo]="1.75" />
-    </button>
-  </div>
+      @for (i of casilleros; track i) {
+        <span
+          class="casillero"
+          [class.casillero--lleno]="i < digitos().length"
+          [class.casillero--siguiente]="i === siguiente()"
+          [style.--i]="i"
+        >
+          <span class="casillero__punto"></span>
+          <app-icono class="casillero__check" nombre="Check" [tamano]="20" [trazo]="3" />
+        </span>
+      }
+    </div>
+
+    <p class="panel__mensaje" role="alert" aria-live="assertive">
+      @if (despertando()) {
+        Conectando con el servidor… la primera vez del día puede tardar hasta un minuto.
+      } @else {
+        {{ mensaje() }}
+      }
+    </p>
+
+    <div class="teclado" role="group" aria-labelledby="pin-indicacion">
+      @for (t of teclas; track t; let i = $index) {
+        <button type="button" class="tecla" [style.--i]="i" [disabled]="bloqueado()" (click)="pulsar(t)">{{ t }}</button>
+      }
+      <span class="tecla tecla--vacia" aria-hidden="true"></span>
+      <button type="button" class="tecla" [style.--i]="10" [disabled]="bloqueado()" (click)="pulsar('0')">0</button>
+      <button
+        type="button"
+        class="tecla tecla--borrar"
+        [style.--i]="11"
+        [disabled]="bloqueado() || digitos().length === 0"
+        (click)="borrar()"
+        aria-label="Borrar el último dígito"
+      >
+        <app-icono nombre="Delete" [tamano]="24" [trazo]="1.75" />
+      </button>
+    </div>
+
+    <p class="panel__pista">También puede escribir los números con el teclado.</p>
+  </section>
 </main>

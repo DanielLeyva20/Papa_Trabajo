@@ -1,219 +1,383 @@
-// Pantalla de bloqueo: fondo de color vivo en movimiento lento + tarjeta de vidrio con teclado numérico.
+// Pantalla de acceso: la foto del equipo, los logos de las empresas y un panel de vidrio oscuro
+// con seis casilleros. Verde = PIN correcto, rojo = incorrecto. La entrada se coreografía una sola vez.
 
 :host {
+  // Colores tomados de los logos (azul ROCER, azul noche y oro PRO-SERVIS) + los de estado de iOS
+  --marca-azul: #2b9bd6;
+  --marca-noche: #0a1532;
+  --marca-oro: #ffc20e;
+  --ok: #30d158;
+  --mal: #ff453a;
+  --vidrio-panel: rgb(10 18 42 / 0.5);
+  --linea: rgb(255 255 255 / 0.16);
+  --texto-claro-2: rgb(255 255 255 / 0.76);
+
   position: fixed;
   inset: 0;
   z-index: 100;
   display: grid;
   place-items: center;
-  overflow: hidden;
-  background: #0b1a3a;
+  overflow-y: auto;
+  padding: var(--e-5) var(--e-4);
+  background: var(--marca-noche);
   color: #fff;
-}
 
-// ---------- Fondo: manchas de color difuminadas que derivan despacio ----------
-.fondo {
-  position: absolute;
-  inset: -20%;
-  filter: blur(70px) saturate(140%);
-}
-
-.mancha {
-  position: absolute;
-  border-radius: 50%;
-  opacity: 0.85;
-  animation: derivar 22s ease-in-out infinite alternate;
-}
-
-.mancha--1 {
-  top: 5%;
-  left: 10%;
-  width: 55vmax;
-  height: 55vmax;
-  background: #0071e3;
-}
-
-.mancha--2 {
-  right: 0;
-  bottom: 0;
-  width: 50vmax;
-  height: 50vmax;
-  background: #5856d6;
-  animation-duration: 28s;
-  animation-direction: alternate-reverse;
-}
-
-.mancha--3 {
-  top: 40%;
-  left: 40%;
-  width: 35vmax;
-  height: 35vmax;
-  background: #30b0c7;
-  animation-duration: 18s;
-}
-
-@keyframes derivar {
-  to {
-    transform: translate(12vmax, -8vmax) scale(1.15);
+  ::selection {
+    background: rgb(255 194 14 / 0.35);
   }
 }
 
-// ---------- Tarjeta de vidrio ----------
-.bloqueo {
+// ---------- Escena: foto + velo + barrido de luz ----------
+.escena {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.escena__foto {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 62%;
+  // Entra desenfocada y de cerca; luego respira muy despacio (Ken Burns)
+  animation:
+    foto-entrar 1.6s var(--ease-out) both,
+    foto-respirar 38s ease-in-out 1.6s infinite alternate;
+}
+
+@keyframes foto-entrar {
+  from {
+    opacity: 0;
+    filter: blur(16px) saturate(0.6);
+    transform: scale(1.16);
+  }
+  to {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes foto-respirar {
+  from {
+    transform: scale(1.05);
+  }
+  to {
+    transform: scale(1.12) translate(-1.5%, -1%);
+  }
+}
+
+// Velo azul noche: deja ver al equipo arriba y oscurece donde va el panel. Brillos de marca en las esquinas.
+.escena__velo {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(60% 50% at 88% 6%, rgb(43 155 214 / 0.35), transparent 70%),
+    radial-gradient(50% 45% at 8% 100%, rgb(255 194 14 / 0.16), transparent 70%),
+    radial-gradient(70% 60% at 50% 55%, rgb(6 12 32 / 0.35), rgb(6 12 32 / 0.8)),
+    linear-gradient(180deg, rgb(8 16 40 / 0.45) 0%, rgb(8 16 40 / 0.62) 40%, rgb(6 12 32 / 0.9) 100%);
+}
+
+// Una franja de luz cruza la escena de vez en cuando, como el brillo sobre un vidrio
+.escena__luz {
+  position: absolute;
+  top: -30%;
+  left: 0;
+  width: 34vmax;
+  height: 160%;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.09) 45%, rgb(255 255 255 / 0.14) 50%, rgb(255 255 255 / 0.09) 55%, transparent);
+  filter: blur(8px);
+  transform: translateX(-60vmax) rotate(18deg);
+  animation: luz-cruzar 11s cubic-bezier(0.45, 0, 0.2, 1) 2.2s infinite;
+}
+
+@keyframes luz-cruzar {
+  0% {
+    transform: translateX(-60vmax) rotate(18deg);
+  }
+  45%,
+  100% {
+    transform: translateX(160vw) rotate(18deg);
+  }
+}
+
+// ---------- Contenido ----------
+.acceso {
   position: relative;
   display: grid;
   justify-items: center;
-  width: min(400px, calc(100vw - 32px));
-  padding: var(--e-6) var(--e-5) var(--e-5);
-  border-radius: 34px;
-  background: rgb(255 255 255 / 0.12);
-  backdrop-filter: blur(30px) saturate(160%);
-  border: 0.5px solid rgb(255 255 255 / 0.28);
-  box-shadow: 0 30px 80px -20px rgb(0 0 0 / 0.45), inset 0 0.5px 0 rgb(255 255 255 / 0.5);
-  animation: llegar 700ms var(--resorte) both;
-  transition: transform 600ms var(--resorte), opacity 500ms ease, filter 500ms ease;
+  gap: var(--e-5);
+  width: min(440px, 100%);
 }
 
-@keyframes llegar {
+.logos {
+  display: flex;
+  gap: var(--e-3);
+}
+
+.logo {
+  width: auto;
+  height: 92px;
+  border-radius: 16px;
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.5),
+    0 14px 30px -8px rgb(0 0 0 / 0.55);
+  animation: logo-entrar 900ms var(--resorte) both;
+
+  &:nth-child(1) {
+    animation-delay: 250ms;
+    --desde: -18px;
+  }
+
+  &:nth-child(2) {
+    animation-delay: 340ms;
+    --desde: 18px;
+  }
+}
+
+@keyframes logo-entrar {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateX(var(--desde)) translateY(-10px) scale(0.92);
+  }
+}
+
+.panel {
+  display: grid;
+  justify-items: center;
+  width: 100%;
+  padding: var(--e-6) var(--e-6) var(--e-5);
+  border-radius: 30px;
+  background: var(--vidrio-panel);
+  box-shadow:
+    inset 0 0 0 1px var(--linea),
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    0 40px 80px -24px rgb(0 0 0 / 0.65);
+  backdrop-filter: blur(28px) saturate(170%);
+  text-align: center;
+  animation: panel-entrar 1s var(--resorte) 380ms both;
+  transition: box-shadow 400ms ease;
+}
+
+@keyframes panel-entrar {
   from {
     opacity: 0;
     filter: blur(10px);
-    transform: translateY(24px) scale(0.96);
+    transform: translateY(26px) scale(0.97);
   }
 }
 
-// Al acertar, la tarjeta se "abre" hacia el sistema
-.bloqueo[data-estado='correcto'] {
-  transform: scale(1.06);
-  opacity: 0;
-  filter: blur(8px);
-  transition-delay: 250ms;
+// Al acertar, el borde del panel se tiñe de verde
+.acceso[data-estado='correcto'] .panel {
+  box-shadow:
+    inset 0 0 0 1px rgb(48 209 88 / 0.55),
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    0 40px 80px -24px rgb(0 0 0 / 0.65);
 }
 
-.bloqueo__icono {
-  border-radius: 18px;
-  box-shadow: 0 12px 30px -8px rgb(0 0 0 / 0.5);
-  animation: flotar 5s ease-in-out infinite;
-}
-
-@keyframes flotar {
-  50% {
-    transform: translateY(-5px);
-  }
-}
-
-.bloqueo__titulo {
-  margin-top: var(--e-4);
-  font-size: 1.75rem;
+.panel__titulo {
+  font-size: 1.875rem;
   font-weight: 700;
   letter-spacing: -0.03em;
+  line-height: 1.1;
 }
 
-.bloqueo__entidad {
-  font-size: var(--t-xs);
-  color: rgb(255 255 255 / 0.78);
+.panel__entidad {
+  margin-top: 4px;
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--texto-claro-2);
 }
 
-.bloqueo__indicacion {
+.panel__indicacion {
   margin-top: var(--e-5);
   font-size: var(--t-md);
   font-weight: 600;
 }
 
-// ---------- Puntos del PIN ----------
-.puntos {
-  display: flex;
-  gap: 16px;
+// ---------- Casilleros ----------
+.casilleros {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  width: 100%;
+  max-width: 352px;
   margin-top: var(--e-4);
 }
 
-.punto {
-  width: 15px;
-  height: 15px;
-  border-radius: 50%;
-  border: 1.75px solid rgb(255 255 255 / 0.9);
-  transition: background-color 160ms ease, transform 260ms var(--rebote), border-color 200ms ease;
-}
-
-.punto--lleno {
-  background: #fff;
-  transform: scale(1.1);
-}
-
-[data-estado='verificando'] .punto {
-  animation: latir 900ms ease-in-out infinite;
-  animation-delay: calc(var(--i) * 90ms);
-}
-
-@keyframes latir {
-  50% {
-    opacity: 0.4;
-    transform: scale(0.85);
-  }
-}
-
-[data-estado='error'] .puntos,
-[data-estado='bloqueado'] .puntos {
-  animation: sacudir 480ms var(--ease-out);
-}
-
-[data-estado='error'] .punto,
-[data-estado='bloqueado'] .punto {
-  border-color: #ff6961;
-}
-
-[data-estado='correcto'] .punto {
-  background: #30d158;
-  border-color: #30d158;
-  transform: scale(1.2);
-  transition-delay: calc(var(--i) * 40ms);
+.casilleros[data-estado='error'],
+.casilleros[data-estado='bloqueado'] {
+  animation: sacudir 460ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
 }
 
 @keyframes sacudir {
   15%,
-  55% {
-    transform: translateX(-12px);
+  85% {
+    transform: translateX(-3px);
   }
-  35%,
-  75% {
-    transform: translateX(12px);
+  30%,
+  70% {
+    transform: translateX(7px);
+  }
+  45%,
+  60% {
+    transform: translateX(-9px);
   }
 }
 
-.bloqueo__mensaje {
+.casillero {
+  position: relative;
   display: grid;
   place-items: center;
-  min-height: 2.8em;
-  max-width: 32ch;
-  margin-top: var(--e-3);
-  text-align: center;
-  font-size: var(--t-xs);
-  font-weight: 600;
-  color: #fff;
+  height: 60px;
+  border-radius: 15px;
+  background: rgb(255 255 255 / 0.07);
+  box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 0.2);
+  transition:
+    background-color 260ms ease,
+    box-shadow 260ms ease,
+    transform 420ms var(--rebote);
+
+  > * {
+    grid-area: 1 / 1;
+  }
 }
 
-// Error legible sobre cualquier parte del fondo: texto blanco sobre pastilla roja
-[data-estado='error'] .bloqueo__mensaje,
-[data-estado='bloqueado'] .bloqueo__mensaje {
-  padding: 6px 14px;
-  border-radius: var(--pildora);
-  background: rgb(215 0 21 / 0.88);
-  animation: aparecer-mensaje 300ms var(--resorte);
+// Solo en la entrada: así los cambios de estado no repiten la aparición
+.acceso--entrando .casillero {
+  animation: casillero-entrar 700ms var(--resorte) both;
+  animation-delay: calc(560ms + var(--i) * 45ms);
 }
 
-@keyframes aparecer-mensaje {
+@keyframes casillero-entrar {
   from {
     opacity: 0;
-    transform: scale(0.94);
+    transform: translateY(12px) scale(0.9);
   }
+}
+
+.casillero--lleno {
+  background: rgb(255 255 255 / 0.13);
+  box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 0.55);
+}
+
+// El casillero que espera el próximo dígito: borde dorado que late suave
+.casillero--siguiente {
+  box-shadow:
+    inset 0 0 0 2px var(--marca-oro),
+    0 0 0 4px rgb(255 194 14 / 0.16);
+}
+
+.acceso:not(.acceso--entrando) .casillero--siguiente {
+  animation: latir 1.6s ease-in-out infinite;
+}
+
+@keyframes latir {
+  50% {
+    box-shadow:
+      inset 0 0 0 2px var(--marca-oro),
+      0 0 0 7px rgb(255 194 14 / 0.06);
+  }
+}
+
+.casillero__punto {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0;
+  transform: scale(0.2);
+  transition:
+    opacity 160ms ease,
+    transform 380ms var(--rebote);
+}
+
+.casillero--lleno .casillero__punto {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.casillero__check {
+  opacity: 0;
+  transform: scale(0.3) rotate(-25deg);
+  transition:
+    opacity 200ms ease,
+    transform 460ms var(--rebote);
+}
+
+// Verificando: una ola recorre los casilleros mientras responde el servidor
+.casilleros[data-estado='verificando'] .casillero {
+  animation: ola 900ms ease-in-out calc(var(--i) * 80ms) infinite;
+}
+
+@keyframes ola {
+  0%,
+  100% {
+    transform: translateY(0);
+    background: rgb(255 255 255 / 0.13);
+  }
+  40% {
+    transform: translateY(-5px);
+    background: rgb(255 255 255 / 0.28);
+  }
+}
+
+// Correcto: se ponen verdes uno tras otro y aparece el check
+.casilleros[data-estado='correcto'] .casillero {
+  background: var(--ok);
+  box-shadow: 0 10px 24px -6px rgb(48 209 88 / 0.55);
+  transform: scale(1.04);
+  transition-delay: calc(var(--i) * 55ms);
+
+  .casillero__punto {
+    opacity: 0;
+    transform: scale(0.2);
+    transition-delay: calc(var(--i) * 55ms);
+  }
+
+  .casillero__check {
+    opacity: 1;
+    transform: none;
+    transition-delay: calc(80ms + var(--i) * 55ms);
+  }
+}
+
+// Incorrecto (o bloqueado): todos en rojo a la vez
+.casilleros[data-estado='error'] .casillero,
+.casilleros[data-estado='bloqueado'] .casillero {
+  background: var(--mal);
+  box-shadow: 0 10px 24px -8px rgb(255 69 58 / 0.55);
+}
+
+.casilleros[data-estado='bloqueado'] .casillero {
+  opacity: 0.7;
+}
+
+// ---------- Mensajes ----------
+.panel__mensaje {
+  min-height: 2.6em;
+  margin-top: var(--e-3);
+  max-width: 34ch;
+  font-size: var(--t-sm);
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--texto-claro-2);
+  text-wrap: balance;
+}
+
+.acceso[data-estado='error'] .panel__mensaje,
+.acceso[data-estado='bloqueado'] .panel__mensaje {
+  color: #ffb3ad;
 }
 
 // ---------- Teclado numérico ----------
 .teclado {
   display: grid;
   grid-template-columns: repeat(3, 76px);
-  gap: 16px 24px;
-  margin-top: var(--e-2);
+  gap: 14px 22px;
+  justify-content: center;
 }
 
 .tecla {
@@ -223,55 +387,89 @@
   height: 76px;
   border: 0;
   border-radius: 50%;
-  background: rgb(255 255 255 / 0.16);
-  backdrop-filter: blur(10px);
+  background: rgb(255 255 255 / 0.11);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
   color: #fff;
-  font-size: 2rem;
-  font-weight: 400;
-  letter-spacing: 0;
-  transition: background-color 120ms ease, transform 160ms var(--ease-out);
+  font-size: 1.875rem;
+  font-weight: 450;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 180ms ease,
+    transform 160ms var(--ease-out);
+  animation: tecla-entrar 600ms var(--resorte) both;
+  animation-delay: calc(700ms + var(--i, 0) * 28ms);
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover:not(:disabled) {
+      background: rgb(255 255 255 / 0.2);
+    }
+  }
 
   &:active:not(:disabled) {
-    background: rgb(255 255 255 / 0.42);
-    transform: scale(0.94);
-    transition-duration: 40ms;
+    background: rgb(255 255 255 / 0.34);
+    transform: scale(0.92);
+    transition-duration: 60ms;
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--marca-oro);
+    outline-offset: 3px;
   }
 
   &:disabled {
     cursor: default;
-    opacity: 0.5;
+    opacity: 0.45;
   }
+}
 
-  &:focus-visible {
-    outline: 3px solid #fff;
-    outline-offset: 3px;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    &:hover:not(:disabled) {
-      background: rgb(255 255 255 / 0.24);
-    }
+@keyframes tecla-entrar {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.85);
   }
 }
 
 .tecla--vacia {
-  background: none;
-  backdrop-filter: none;
+  visibility: hidden;
 }
 
 .tecla--borrar {
-  background: none;
-  backdrop-filter: none;
+  background: transparent;
+  box-shadow: none;
 }
 
-@media (max-height: 700px) {
-  .bloqueo {
-    padding-top: var(--e-4);
+.panel__pista {
+  margin-top: var(--e-4);
+  font-size: var(--t-xs);
+  color: rgb(255 255 255 / 0.62);
+
+  // En celulares no hay teclado físico
+  @media (pointer: coarse) {
+    display: none;
+  }
+}
+
+// ---------- Pantallas bajas (laptops) y teléfonos ----------
+@media (max-height: 820px) {
+  .acceso {
+    gap: var(--e-4);
   }
 
-  .bloqueo__icono {
-    width: 56px;
-    height: 56px;
+  .logo {
+    height: 64px;
+    border-radius: 13px;
+  }
+
+  .panel {
+    padding: var(--e-5) var(--e-5) var(--e-4);
+  }
+
+  .panel__indicacion {
+    margin-top: var(--e-4);
   }
 
   .teclado {
@@ -282,20 +480,62 @@
   .tecla {
     width: 66px;
     height: 66px;
-    font-size: 1.75rem;
+    font-size: 1.625rem;
   }
 }
 
+@media (max-width: 420px) {
+  .panel {
+    padding: var(--e-5) var(--e-4) var(--e-4);
+    border-radius: 26px;
+  }
+
+  .casilleros {
+    gap: 7px;
+  }
+
+  .casillero {
+    height: 54px;
+    border-radius: 13px;
+  }
+
+  .teclado {
+    grid-template-columns: repeat(3, 68px);
+    gap: 12px 18px;
+  }
+
+  .tecla {
+    width: 68px;
+    height: 68px;
+  }
+}
+
+// ---------- Movimiento reducido: sin cámara, sin barrido ni sacudida; los colores cuentan lo mismo ----------
 @media (prefers-reduced-motion: reduce) {
-  .mancha,
-  .bloqueo__icono {
+  .escena__foto {
+    animation: none;
+    transform: scale(1.05);
+  }
+
+  .escena__luz {
+    display: none;
+  }
+
+  .logo,
+  .panel,
+  .casillero,
+  .tecla {
+    animation-duration: 1ms;
+    animation-delay: 0ms;
+  }
+
+  .acceso .casillero--siguiente,
+  .casilleros[data-estado] .casillero {
     animation: none;
   }
-}
 
-@media (prefers-reduced-transparency: reduce) {
-  .bloqueo {
-    background: rgb(20 40 90 / 0.92);
-    backdrop-filter: none;
+  .casilleros[data-estado='error'],
+  .casilleros[data-estado='bloqueado'] {
+    animation: none;
   }
 }

@@ -42,6 +42,7 @@ import {
   TriangleAlert,
   ArrowRight,
   RotateCcw,
+  Save,
   type IconNode,
 } from 'lucide';
 
@@ -88,6 +89,7 @@ const ICONOS = {
   TriangleAlert,
   ArrowRight,
   RotateCcw,
+  Save,
 } satisfies Record<string, IconNode>;
 
 export type NombreIcono = keyof typeof ICONOS;

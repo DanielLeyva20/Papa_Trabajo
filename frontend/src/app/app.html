@@ -25,10 +25,28 @@
     }
   </nav>
 
-  <p class="guardado" [attr.data-estado]="estado()" role="status" aria-live="polite">
-    <span class="guardado__punto" aria-hidden="true"></span>
-    {{ textoEstado() }}
-  </p>
+  <button
+    type="button"
+    class="guardar"
+    [attr.data-estado]="estado()"
+    [disabled]="estado() === 'guardando'"
+    [title]="tituloGuardar()"
+    (click)="guardar()"
+  >
+    @switch (estado()) {
+      @case ('guardando') {
+        <app-icono class="girando" nombre="LoaderCircle" [tamano]="17" [trazo]="2.25" />
+      }
+      @case ('listo') {
+        <app-icono class="guardar__check" nombre="Check" [tamano]="17" [trazo]="2.75" />
+      }
+      @default {
+        <app-icono nombre="Save" [tamano]="17" [trazo]="2.25" />
+      }
+    }
+    <span>{{ textoEstado() }}</span>
+  </button>
+  <span class="solo-lectores" role="status" aria-live="polite">{{ anuncioEstado() }}</span>
 
   <button type="button" class="boton boton--icono salir" (click)="salir()" title="Salir del sistema" aria-label="Salir del sistema">
     <app-icono nombre="LogOut" [tamano]="18" />
