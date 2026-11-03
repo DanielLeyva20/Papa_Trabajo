@@ -30,6 +30,15 @@
   --verde-velo: rgb(36 138 61 / 0.1);
   --amarillo: #ffcc00;
   --indigo: #5856d6;
+  --ambar: #a15c00; // avisos que no son feriados ni faltas de personal (el rojo queda reservado)
+  --ambar-velo: rgb(255 159 10 / 0.12);
+  --naranja: #c93400;
+  --sobre-color: #ffffff; // texto sobre botones y pastillas de color
+
+  // Filas de totales: teñidas para que no se pierdan entre las filas de agentes
+  --total-dia: color-mix(in srgb, #ff9f0a 13%, var(--superficie));
+  --total-noche: color-mix(in srgb, var(--indigo) 13%, var(--superficie));
+  --barra-desplazamiento: rgb(0 0 0 / 0.22);
 
   // Tipografía
   --f-texto: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif;
@@ -67,4 +76,55 @@
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --resorte: cubic-bezier(0.32, 0.72, 0, 1);
   --rebote: cubic-bezier(0.34, 1.28, 0.64, 1); // rebote sutil: solo en respuestas a un toque (sellos, íconos)
+}
+
+// ---------- Modo oscuro: mismos nombres, valores de los colores oscuros de Apple ----------
+@mixin oscuro {
+  color-scheme: dark;
+
+  --fondo: #0d0d0f;
+  --superficie: #1c1c1e;
+  --superficie-2: #242427;
+  --relleno: rgb(118 118 128 / 0.28);
+  --relleno-suave: rgb(118 118 128 / 0.16);
+  --separador: rgb(84 84 88 / 0.42);
+  --separador-fuerte: rgb(84 84 88 / 0.75);
+  --vidrio: rgb(28 28 30 / 0.74);
+  --vidrio-oscuro: rgb(58 58 60 / 0.92);
+
+  --texto: #f5f5f7;
+  --texto-2: #aeaeb2;
+  --texto-3: #98989d;
+
+  --azul: #0a84ff;
+  --azul-hondo: #409cff;
+  --azul-velo: rgb(10 132 255 / 0.2);
+  --rojo: #ff453a;
+  --rojo-velo: rgb(255 69 58 / 0.14);
+  --verde: #30d158;
+  --verde-velo: rgb(48 209 88 / 0.16);
+  --amarillo: #ffd60a;
+  --indigo: #8e8cff;
+  --ambar: #ffb340;
+  --ambar-velo: rgb(255 159 10 / 0.18);
+  --naranja: #ff9f0a;
+
+  --total-dia: color-mix(in srgb, #ff9f0a 16%, var(--superficie));
+  --total-noche: color-mix(in srgb, var(--indigo) 18%, var(--superficie));
+  --barra-desplazamiento: rgb(255 255 255 / 0.24);
+
+  --sombra-1: 0 1px 2px rgb(0 0 0 / 0.3), 0 0 0 0.5px rgb(255 255 255 / 0.06);
+  --sombra-2: 0 2px 6px rgb(0 0 0 / 0.35), 0 18px 40px -16px rgb(0 0 0 / 0.6);
+  --sombra-flotante: 0 10px 30px rgb(0 0 0 / 0.45), 0 30px 70px -20px rgb(0 0 0 / 0.7), 0 0 0 0.5px rgb(255 255 255 / 0.1);
+}
+
+// La pantalla elige el tema con data-tema (botón de la barra); antes de que cargue, se sigue al sistema.
+:root[data-tema='oscuro'] {
+  @include oscuro;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema]) {
+    @include oscuro;
+  }
 }

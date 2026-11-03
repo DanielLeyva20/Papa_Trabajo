@@ -84,8 +84,8 @@
   border: 3px solid var(--superficie);
   border-radius: 50%;
   background: var(--azul);
-  color: #fff;
-  box-shadow: 0 4px 12px -2px rgb(0 113 227 / 0.55);
+  color: var(--sobre-color);
+  box-shadow: 0 4px 12px -2px color-mix(in srgb, var(--azul) 55%, transparent);
   transition: transform 260ms var(--rebote);
 
   &:active {

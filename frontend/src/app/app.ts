@@ -4,6 +4,7 @@ import { IndicadorGuardado } from './core/services/estado-guardado';
 import { Avisos } from './core/services/avisos';
 import { Confirmacion } from './core/services/confirmacion';
 import { Sesion } from './core/services/sesion';
+import { TemaVisual } from './core/services/tema';
 import { CapaAvisos } from './core/ui/capa-avisos';
 import { Deslizante } from './core/ui/deslizante';
 import { DialogoConfirmacion } from './core/ui/dialogo-confirmacion';
@@ -31,6 +32,7 @@ export class App {
   private readonly confirmacion = inject(Confirmacion);
   private readonly avisos = inject(Avisos);
   protected readonly sesion = inject(Sesion);
+  protected readonly tema = inject(TemaVisual);
 
   protected readonly enlaces: EnlaceNav[] = [
     { ruta: '/rol', texto: 'Rol del mes', icono: 'CalendarDays' },

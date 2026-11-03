@@ -58,16 +58,16 @@ a {
 }
 
 ::selection {
-  background: rgb(0 113 227 / 0.22);
+  background: color-mix(in srgb, var(--azul) 22%, transparent);
 }
 
 :focus-visible {
-  outline: 3px solid rgb(0 113 227 / 0.55);
+  outline: 3px solid color-mix(in srgb, var(--azul) 55%, transparent);
   outline-offset: 2px;
 }
 
 * {
-  scrollbar-color: rgb(0 0 0 / 0.22) transparent;
+  scrollbar-color: var(--barra-desplazamiento) transparent;
   scrollbar-width: thin;
 }
 
@@ -145,8 +145,8 @@ a {
 
 .boton--primario {
   background: var(--azul);
-  color: #fff;
-  box-shadow: 0 4px 14px -4px rgb(0 113 227 / 0.55);
+  color: var(--sobre-color);
+  box-shadow: 0 4px 14px -4px color-mix(in srgb, var(--azul) 55%, transparent);
 
   @media (hover: hover) and (pointer: fine) {
     &:hover:not(:disabled) {
@@ -157,11 +157,11 @@ a {
 
 .boton--oscuro {
   background: var(--texto);
-  color: #fff;
+  color: var(--fondo);
 
   @media (hover: hover) and (pointer: fine) {
     &:hover:not(:disabled) {
-      background: #3a3a3c;
+      background: color-mix(in srgb, var(--texto) 82%, var(--fondo));
     }
   }
 }
@@ -183,7 +183,7 @@ a {
 
   @media (hover: hover) and (pointer: fine) {
     &:hover:not(:disabled) {
-      background: rgb(215 0 21 / 0.13);
+      background: color-mix(in srgb, var(--rojo) 13%, transparent);
     }
   }
 }
@@ -225,7 +225,7 @@ a {
   &:focus {
     outline: none;
     border-color: var(--azul);
-    box-shadow: 0 0 0 4px rgb(0 113 227 / 0.16);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--azul) 16%, transparent);
   }
 
   &::placeholder {
@@ -342,6 +342,27 @@ a {
   }
 }
 
+// Cambio de modo claro/oscuro: un fundido limpio, sin el desenfoque del cambio de pantalla
+:root.cambiando-tema::view-transition-old(*),
+:root.cambiando-tema::view-transition-new(*) {
+  animation-duration: 320ms;
+  animation-timing-function: var(--ease-out);
+}
+
+:root.cambiando-tema::view-transition-old(root) {
+  animation: none;
+}
+
+:root.cambiando-tema::view-transition-new(root) {
+  animation: tema-entrar 320ms var(--ease-out) both;
+}
+
+@keyframes tema-entrar {
+  from {
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -359,7 +380,7 @@ a {
 
 @media (prefers-reduced-transparency: reduce) {
   :root {
-    --vidrio: #ffffff;
+    --vidrio: var(--superficie);
   }
 }
 
@@ -377,10 +398,10 @@ a {
 
 .campo--error .entrada {
   border-color: var(--rojo);
-  background: rgb(215 0 21 / 0.03);
+  background: color-mix(in srgb, var(--rojo) 4%, transparent);
 
   &:focus {
-    box-shadow: 0 0 0 4px rgb(215 0 21 / 0.14);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--rojo) 14%, transparent);
   }
 }
 
@@ -449,6 +470,6 @@ a {
 }
 
 .interruptor input:focus-visible + .interruptor__pista {
-  outline: 3px solid rgb(0 113 227 / 0.55);
+  outline: 3px solid color-mix(in srgb, var(--azul) 55%, transparent);
   outline-offset: 2px;
 }

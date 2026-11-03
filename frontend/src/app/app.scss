@@ -11,7 +11,7 @@
   padding: var(--e-2) var(--e-4);
   border-radius: var(--pildora);
   background: var(--texto);
-  color: #fff;
+  color: var(--sobre-color);
 
   &:focus {
     top: var(--e-2);
@@ -124,7 +124,7 @@
   }
 
   &:focus-visible {
-    outline: 3px solid rgb(0 113 227 / 0.45);
+    outline: 3px solid color-mix(in srgb, var(--azul) 45%, transparent);
     outline-offset: 2px;
   }
 
@@ -147,8 +147,8 @@
 
 .guardar[data-estado='pendiente'] {
   background: var(--azul);
-  color: #fff;
-  box-shadow: 0 6px 16px -6px rgb(0 113 227 / 0.6);
+  color: var(--sobre-color);
+  box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--azul) 60%, transparent);
   animation: guardar-aparecer 360ms var(--rebote);
 
   @media (hover: hover) and (pointer: fine) {
@@ -171,9 +171,28 @@
 
 // Sin conexión: ámbar (en este sistema el rojo es solo para feriados y falta de personal)
 .guardar[data-estado='error'] {
-  background: rgb(255 159 10 / 0.16);
-  color: #a15c00;
-  box-shadow: inset 0 0 0 1px rgb(161 92 0 / 0.35);
+  background: var(--ambar-velo);
+  color: var(--ambar);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ambar) 40%, transparent);
+}
+
+.tema {
+  width: 38px;
+  min-height: 38px;
+  background: transparent;
+  color: var(--texto-2);
+}
+
+// El ícono entra girando al cambiar (sol ↔ luna)
+.tema__icono {
+  animation: tema-girar 420ms var(--rebote);
+}
+
+@keyframes tema-girar {
+  from {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.6);
+  }
 }
 
 .salir {

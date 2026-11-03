@@ -48,6 +48,20 @@
   </button>
   <span class="solo-lectores" role="status" aria-live="polite">{{ anuncioEstado() }}</span>
 
+  <button
+    type="button"
+    class="boton boton--icono tema"
+    (click)="tema.alternar()"
+    [title]="tema.actual() === 'oscuro' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+    [attr.aria-label]="tema.actual() === 'oscuro' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+  >
+    @if (tema.actual() === 'oscuro') {
+      <app-icono class="tema__icono" nombre="Sun" [tamano]="18" />
+    } @else {
+      <app-icono class="tema__icono" nombre="Moon" [tamano]="18" />
+    }
+  </button>
+
   <button type="button" class="boton boton--icono salir" (click)="salir()" title="Salir del sistema" aria-label="Salir del sistema">
     <app-icono nombre="LogOut" [tamano]="18" />
   </button>

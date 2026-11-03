@@ -69,7 +69,7 @@
   height: 32px;
   border-radius: 10px;
   background: linear-gradient(160deg, #3d9bff, var(--azul));
-  color: #fff;
+  color: var(--sobre-color);
   font-size: var(--t-xs);
   font-weight: 700;
 }

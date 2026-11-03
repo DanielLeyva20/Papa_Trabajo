@@ -58,7 +58,7 @@ const CICLO: (string | null)[] = ['D', 'N', 'L', null];
 
       @media (hover: hover) and (pointer: fine) {
         &:hover {
-          box-shadow: 0 0 0 1.5px var(--azul), 0 4px 12px -4px rgb(0 113 227 / 0.4);
+          box-shadow: 0 0 0 1.5px var(--azul), 0 4px 12px -4px color-mix(in srgb, var(--azul) 40%, transparent);
         }
       }
     }
@@ -89,6 +89,7 @@ const CICLO: (string | null)[] = ['D', 'N', 'L', null];
 
     .dia__marca--clara {
       background: var(--relleno-suave) !important;
+      color: var(--texto) !important; // el texto oscuro guardado para la D no se ve en modo oscuro
     }
 
     .dia__marca--vacia {

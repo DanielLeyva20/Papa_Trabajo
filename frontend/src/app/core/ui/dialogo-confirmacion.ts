@@ -31,7 +31,7 @@ import { Confirmacion } from '../services/confirmacion';
       padding: var(--e-6) var(--e-5) var(--e-5);
       border: 0;
       border-radius: var(--radio-xl);
-      background: rgb(255 255 255 / 0.92);
+      background: color-mix(in srgb, var(--superficie) 92%, transparent);
       backdrop-filter: blur(30px) saturate(180%);
       box-shadow: var(--sombra-flotante);
       text-align: center;

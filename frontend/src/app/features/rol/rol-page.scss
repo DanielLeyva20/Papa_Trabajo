@@ -111,7 +111,7 @@
   }
 
   .sedes--fija {
-    background: rgb(245 245 247 / 0.86);
+    background: color-mix(in srgb, var(--fondo) 86%, transparent);
     backdrop-filter: blur(20px) saturate(180%);
     box-shadow: 0 8px 24px -14px rgb(0 0 0 / 0.3), inset 0 0 0 0.5px var(--separador);
   }
@@ -157,10 +157,10 @@
 @keyframes latido {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgb(215 0 21 / 0.35);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--rojo) 35%, transparent);
   }
   50% {
-    box-shadow: 0 0 0 4px rgb(215 0 21 / 0);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--rojo) 0%, transparent);
   }
 }
 
@@ -194,7 +194,7 @@
   height: 26px;
   border-radius: 50%;
   background: var(--rojo);
-  color: #fff;
+  color: var(--sobre-color);
   font-size: 0.75rem;
   font-weight: 700;
 }
@@ -232,7 +232,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: rgb(215 0 21 / 0.12);
+  background: color-mix(in srgb, var(--rojo) 12%, transparent);
 }
 
 .sin-conexion {
@@ -422,8 +422,8 @@
   gap: 5px;
   padding: 3px 10px;
   border-radius: var(--pildora);
-  background: rgb(255 159 10 / 0.12);
-  color: #a15c00;
+  background: var(--ambar-velo);
+  color: var(--ambar);
   font-size: var(--t-xs);
   font-weight: 600;
 }

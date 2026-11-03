@@ -74,7 +74,7 @@
 }
 
 .formato[data-reporte='ausencias'] .formato__icono {
-  color: #c93400;
+  color: var(--naranja);
 }
 
 // Excel y PDF se distinguen por el color del ícono, no del botón entero
@@ -261,6 +261,7 @@
 
 .marca--clara {
   background: var(--relleno) !important;
+  color: var(--texto) !important; // el texto oscuro guardado para la D no se ve en modo oscuro
 }
 
 .cuadro__titulo {

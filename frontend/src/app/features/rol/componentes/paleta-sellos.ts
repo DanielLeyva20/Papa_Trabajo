@@ -74,10 +74,10 @@ import { Icono } from '../../../core/ui/icono';
       padding: 6px;
       border-radius: 22px;
       /* Vidrio denso: lo de abajo se intuye pero no compite con los sellos */
-      background: rgb(255 255 255 / 0.92);
+      background: color-mix(in srgb, var(--superficie) 92%, transparent);
       backdrop-filter: blur(28px) saturate(190%);
-      border: 0.5px solid rgb(255 255 255 / 0.6);
-      box-shadow: var(--sombra-flotante), inset 0 0.5px 0 rgb(255 255 255 / 0.8);
+      border: 0.5px solid color-mix(in srgb, var(--superficie) 60%, var(--separador));
+      box-shadow: var(--sombra-flotante), inset 0 0.5px 0 color-mix(in srgb, var(--superficie) 80%, transparent);
     }
 
     .dock__sellos {

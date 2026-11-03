@@ -19,6 +19,11 @@
     @keyframes arranque-giro { to { transform: rotate(360deg); } }
     @keyframes arranque-aviso { to { opacity: 1; } }
     @media (prefers-reduced-motion: reduce) { .arranque i { animation-duration: 2s; } }
+    @media (prefers-color-scheme: dark) {
+      .arranque { background: #0d0d0f; color: #aeaeb2; }
+      .arranque small { color: #98989d; }
+      .arranque i { border-color: rgb(10 132 255 / .2); border-top-color: #0a84ff; }
+    }
   </style>
 </head>
 <body>

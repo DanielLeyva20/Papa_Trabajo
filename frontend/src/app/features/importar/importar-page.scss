@@ -1,8 +1,4 @@
-// En este sistema el rojo es solo para feriados y faltas de personal: aquí los avisos van en ámbar.
-:host {
-  --ambar: #a15c00;
-  --ambar-velo: rgb(255 159 10 / 0.12);
-}
+// En este sistema el rojo es solo para feriados y faltas de personal: aquí los avisos van en ámbar (--ambar).
 
 .pagina {
   display: grid;
@@ -63,7 +59,7 @@
 
   span {
     background: var(--azul);
-    color: #fff;
+    color: var(--sobre-color);
   }
 }
 
@@ -88,7 +84,7 @@
 
   &:focus-within {
     border-color: var(--azul);
-    box-shadow: 0 0 0 4px rgb(0 113 227 / 0.16);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--azul) 16%, transparent);
   }
 
   @media (hover: hover) and (pointer: fine) {
@@ -290,7 +286,7 @@
   }
 
   &:focus-visible {
-    outline: 3px solid rgb(0 113 227 / 0.55);
+    outline: 3px solid color-mix(in srgb, var(--azul) 55%, transparent);
     outline-offset: -3px;
   }
 }
@@ -431,6 +427,7 @@
 
 .tira__dia--clara {
   background: var(--relleno) !important;
+  color: var(--texto) !important; // el texto oscuro guardado para la D no se ve en modo oscuro
 }
 
 .tira__dia--vacia {
@@ -479,7 +476,7 @@
   height: 72px;
   border-radius: 50%;
   background: var(--verde);
-  color: #fff;
+  color: var(--sobre-color);
   animation: sello 520ms var(--rebote) both;
 }
 

@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -29,7 +30,7 @@ interface Posicion {
  */
 @Component({
   selector: 'app-cuadricula-rol',
-  imports: [Avatar, Icono],
+  imports: [Avatar, Icono, NgTemplateOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './cuadricula-rol.html',
   styleUrl: './cuadricula-rol.scss',
@@ -67,7 +68,10 @@ export class CuadriculaRol {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private trazo: { codigo: string | null; visitadas: Set<string> } | null = null;
 
-  /** En la vista juntos, la primera fila de noche lleva una línea divisoria. */
+  /** Grupo que nombra la cabecera: el del cuadro, o el de su primer agente si están juntos. */
+  protected readonly turnoCabecera = computed<Turno>(() => this.turno() ?? this.sede().filas[0]?.turno ?? 'DIA');
+
+  /** En la vista juntos, antes del primer nocturno va otra fila con las fechas (para no perderse al bajar). */
   protected readonly inicioNoche = computed(() => {
     const filas = this.sede().filas;
     const i = filas.findIndex((f) => f.turno === 'NOCHE');

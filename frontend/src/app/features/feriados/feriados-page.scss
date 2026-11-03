@@ -49,7 +49,7 @@
   padding: var(--e-5) var(--e-6);
   border-radius: var(--radio-xl);
   background: linear-gradient(135deg, #ff3b47 0%, var(--rojo) 55%, #a8000f 100%);
-  color: #fff;
+  color: var(--sobre-color);
   box-shadow: 0 20px 40px -20px rgb(215 0 21 / 0.7);
   animation: entrar 620ms var(--resorte);
 }
@@ -68,7 +68,7 @@
   width: 92px;
   overflow: hidden;
   border-radius: 20px;
-  background: #fff;
+  background: var(--superficie);
   color: var(--texto);
   text-align: center;
   box-shadow: 0 10px 24px -10px rgb(0 0 0 / 0.45);
@@ -180,7 +180,7 @@
 .feriado__mes {
   padding: 2px 0;
   background: var(--rojo);
-  color: #fff;
+  color: var(--sobre-color);
   font-size: 0.625rem;
   font-weight: 700;
   letter-spacing: 0.06em;

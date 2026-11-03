@@ -107,16 +107,42 @@
 .agente__turno {
   margin-right: 3px;
   vertical-align: -1px;
-  color: #c27c0e; // ámbar oscuro: legible sobre blanco
+  color: var(--ambar);
 }
 
 .agente__turno--noche {
   color: var(--indigo);
 }
 
-// En la vista juntos, una línea separa a los de día de los de noche
-.fila--inicio-noche > * {
-  border-top: 1.5px solid color-mix(in srgb, var(--indigo) 35%, transparent);
+// ---------- División de grupos: «Agentes diurnos» y «Agentes nocturnos» ----------
+.grupo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 8px;
+  border-radius: var(--pildora);
+  background: var(--ambar-velo);
+  color: var(--ambar);
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.grupo--noche {
+  background: color-mix(in srgb, var(--indigo) 16%, transparent);
+  color: var(--indigo);
+}
+
+// Fila de fechas antes de los nocturnos: teñida de índigo y con una línea arriba,
+// así se ve dónde empieza el turno de noche y en qué día se está sin subir hasta arriba.
+.cabecera-noche > * {
+  border-top: 1.5px solid color-mix(in srgb, var(--indigo) 45%, transparent);
+  background: var(--total-noche);
+}
+
+.cabecera-noche .agente,
+.cabecera-noche:hover .agente {
+  background: var(--total-noche);
 }
 
 .fila--historial .agente__nombre {
@@ -163,7 +189,7 @@ tbody tr:hover .agente {
 .dia--hoy {
   .dia__numero {
     background: var(--azul);
-    color: #fff;
+    color: var(--sobre-color);
   }
 
   .dia__letra {
@@ -180,7 +206,7 @@ tbody tr:hover .agente {
 
   &.dia--hoy .dia__numero {
     background: var(--rojo);
-    color: #fff;
+    color: var(--sobre-color);
   }
 }
 
@@ -209,7 +235,7 @@ tbody tr:hover .agente {
   height: var(--alto-fila);
   padding: 0;
   border-bottom: 0.5px solid var(--separador);
-  border-right: 0.5px solid rgb(60 60 67 / 0.06);
+  border-right: 0.5px solid color-mix(in srgb, var(--separador) 50%, transparent);
   text-align: center;
   cursor: pointer;
   transition: background-color 120ms ease;
@@ -230,7 +256,7 @@ tbody tr:hover .agente {
 }
 
 .celda--hoy {
-  background: rgb(0 113 227 / 0.05);
+  background: color-mix(in srgb, var(--azul) 6%, transparent);
 }
 
 // Columna bajo el puntero
@@ -243,7 +269,7 @@ tbody tr:hover .celda {
 }
 
 tbody tr:hover .celda--columna {
-  background-color: rgb(0 113 227 / 0.1);
+  background-color: color-mix(in srgb, var(--azul) 12%, transparent);
 }
 
 // Mismo agente de turno en otra sede ese día
@@ -270,11 +296,12 @@ tbody tr:hover .celda--columna {
   font-weight: 700;
   letter-spacing: -0.01em;
   pointer-events: none;
-  box-shadow: inset 0 0 0 0.5px rgb(0 0 0 / 0.06);
+  box-shadow: inset 0 0 0 0.5px rgb(0 0 0 / 0.08);
 }
 
 .marca--clara {
   background: var(--relleno-suave) !important;
+  color: var(--texto) !important; // el texto oscuro guardado para la D no se ve en modo oscuro
   box-shadow: none;
 }
 
@@ -305,17 +332,29 @@ tbody tr:hover .celda--columna {
 }
 
 // ---------- Totales ----------
+// Cada fila de totales tiene su color (ámbar el día, índigo la noche) para no confundirla con un agente
 .total th,
 .total td {
-  height: 46px;
-  border-top: 0.5px solid var(--separador-fuerte);
+  height: 48px;
+  border-top: 1.5px solid color-mix(in srgb, var(--ambar) 40%, transparent);
   border-bottom: 0;
-  background: var(--superficie-2);
+  background: var(--total-dia);
 }
 
 .total--noche th,
 .total--noche td {
-  border-top: 0.5px solid var(--separador);
+  border-top: 1.5px solid color-mix(in srgb, var(--indigo) 40%, transparent);
+  background: var(--total-noche);
+}
+
+.total__icono {
+  margin-right: 4px;
+  vertical-align: -2px;
+  color: var(--ambar);
+}
+
+.total__icono--noche {
+  color: var(--indigo);
 }
 
 .agente--total {
@@ -350,22 +389,24 @@ tbody tr:hover .celda--columna {
 .total__valor--pendiente {
   color: var(--texto-2);
   font-weight: 500;
-  box-shadow: inset 0 0 0 1px var(--separador-fuerte);
+  box-shadow: inset 0 0 0 1px var(--separador-fuerte) !important;
 }
 
 // Día completo y en regla: número en pastilla llena
-.total__valor:not(.total__valor--pendiente):not(.total__valor--falta):not(.total__valor--noche) {
-  background: var(--relleno-suave);
+.total__valor:not(.total__valor--falta) {
+  background: var(--superficie);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
 }
 
 .total__valor--falta {
   background: var(--rojo);
-  color: #fff;
+  color: var(--sobre-color);
   transform: scale(1.08);
 }
 
 .total__valor--noche {
   color: var(--indigo);
+  font-weight: 700;
 }
 
 .vacio {
