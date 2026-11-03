@@ -24,14 +24,14 @@ export function construirGeneralPdf(datos: DatosGeneral): Promise<Buffer> {
   const colSedes: ColumnaPdf<SedeGeneral>[] = [
     { titulo: 'N.º', peso: 3, valor: (_s, i) => String(i + 1) },
     { titulo: 'Sede / Dependencia', peso: 30, valor: (s) => s.nombre, alinear: 'left', negrita: true },
-    { titulo: 'Agentes día', peso: 7, valor: (s) => String(s.agentesDia) },
-    { titulo: 'Agentes noche', peso: 7, valor: (s) => String(s.agentesNoche) },
-    { titulo: 'Turnos día', peso: 7, valor: (s) => String(s.turnosDia) },
-    { titulo: 'Turnos noche', peso: 7, valor: (s) => String(s.turnosNoche) },
-    { titulo: 'Prom. día', peso: 7, valor: (s) => String(s.promedioDia), negrita: true },
-    { titulo: 'Prom. noche', peso: 7, valor: (s) => String(s.promedioNoche), negrita: true },
-    { titulo: 'Mínimo', peso: 6, valor: (s) => String(s.minimoDia) },
-    { titulo: 'Días bajo mín.', peso: 8, valor: (s) => String(s.diasBajoMinimo), alerta: (s) => s.diasBajoMinimo > 0 },
+    { titulo: 'Agentes día', peso: 7, valor: (s) => String(s.agentesDia), numerica: true },
+    { titulo: 'Agentes noche', peso: 7, valor: (s) => String(s.agentesNoche), numerica: true },
+    { titulo: 'Turnos día', peso: 7, valor: (s) => String(s.turnosDia), numerica: true },
+    { titulo: 'Turnos noche', peso: 7, valor: (s) => String(s.turnosNoche), numerica: true },
+    { titulo: 'Prom. día', peso: 7, valor: (s) => String(s.promedioDia), numerica: true, negrita: true },
+    { titulo: 'Prom. noche', peso: 7, valor: (s) => String(s.promedioNoche), numerica: true, negrita: true },
+    { titulo: 'Mínimo', peso: 6, valor: (s) => String(s.minimoDia), numerica: true },
+    { titulo: 'Días bajo mín.', peso: 8, valor: (s) => String(s.diasBajoMinimo), numerica: true, alerta: (s) => s.diasBajoMinimo > 0 },
   ];
   tabla(doc, colSedes, general.sedes, {
     titulo: 'Por sede',
@@ -45,17 +45,18 @@ export function construirGeneralPdf(datos: DatosGeneral): Promise<Buffer> {
   const colAgentes: ColumnaPdf<AgenteGeneral>[] = [
     { titulo: 'N.º', peso: 3, valor: (_a, i) => String(i + 1) },
     { titulo: 'Apellidos y nombres', peso: 24, valor: (a) => a.nombres, alinear: 'left', negrita: true },
-    { titulo: 'Cargo', peso: 13, valor: (a) => CARGO_ETIQUETA[a.cargo] },
+    { titulo: 'Cargo', peso: 13, valor: (a) => CARGO_ETIQUETA[a.cargo], alinear: 'left' },
     { titulo: 'Sedes', peso: 16, valor: (a) => a.sedes.join(', '), alinear: 'left' },
     ...datos.codigos.map(
       (t): ColumnaPdf<AgenteGeneral> => ({
         titulo: t.codigo,
         peso: 4,
         valor: (a) => String(a.conteos[t.codigo] ?? 0),
+        numerica: true,
         cabecera: { fondo: t.colorFondo, texto: t.colorTexto },
       }),
     ),
-    { titulo: 'Trabajados', peso: 7, valor: (a) => String(a.turnosDia + a.turnosNoche), negrita: true },
+    { titulo: 'Trabajados', peso: 7, valor: (a) => String(a.turnosDia + a.turnosNoche), negrita: true, numerica: true },
   ];
   tabla(doc, colAgentes, general.diurnos, { titulo: 'Agentes de día (diurnos)', vacio: 'No hay agentes en este turno.' });
   tabla(doc, colAgentes, general.nocturnos, { titulo: 'Agentes de noche (nocturnos)', vacio: 'No hay agentes en este turno.' });

@@ -22,34 +22,37 @@ export function construirAusenciasPdf(datos: DatosAusencias): Promise<Buffer> {
   const colResumen: ColumnaPdf<AusenciasAgente>[] = [
     { titulo: 'N.º', peso: 3, valor: (_a, i) => String(i + 1) },
     { titulo: 'Apellidos y nombres', peso: 24, valor: (a) => a.nombres, alinear: 'left', negrita: true },
-    { titulo: 'Cargo', peso: 13, valor: (a) => CARGO_ETIQUETA[a.cargo] },
+    { titulo: 'Cargo', peso: 13, valor: (a) => CARGO_ETIQUETA[a.cargo], alinear: 'left' },
     { titulo: 'Sedes', peso: 16, valor: (a) => a.sedes.join(', '), alinear: 'left' },
     ...ausencias.tipos.map(
       (t): ColumnaPdf<AusenciasAgente> => ({
         titulo: t.nombre,
         peso: 9,
         valor: (a) => String(a.conteos[t.codigo] ?? 0),
+        numerica: true,
         cabecera: { fondo: t.colorFondo, texto: t.colorTexto },
       }),
     ),
-    { titulo: 'Total', peso: 6, valor: (a) => String(a.total), negrita: true },
+    { titulo: 'Total', peso: 6, valor: (a) => String(a.total), negrita: true, numerica: true },
   ];
+  const hayAusencias = ausencias.porAgente.length > 0;
   tabla(doc, colResumen, ausencias.porAgente, {
     titulo: 'Resumen por agente',
     vacio,
-    totales: ['', 'TOTAL', '', '', ...ausencias.tipos.map((t) => String(ausencias.totales[t.codigo] ?? 0)), String(ausencias.totales.total)],
+    // Sin ausencias no tiene sentido una fila de totales en cero.
+    totales: !hayAusencias ? undefined : ['', 'TOTAL', '', '', ...ausencias.tipos.map((t) => String(ausencias.totales[t.codigo] ?? 0)), String(ausencias.totales.total)],
   });
 
   const colDetalle: ColumnaPdf<Ausencia>[] = [
     { titulo: 'Fecha', peso: 8, valor: (a) => a.fecha.split('-').reverse().join('/') },
     { titulo: 'Día', peso: 4, valor: (a) => a.letra },
     { titulo: 'Apellidos y nombres', peso: 26, valor: (a) => a.nombres, alinear: 'left', negrita: true },
-    { titulo: 'Cargo', peso: 14, valor: (a) => CARGO_ETIQUETA[a.cargo] },
-    { titulo: 'Sede', peso: 12, valor: (a) => a.sede },
+    { titulo: 'Cargo', peso: 14, valor: (a) => CARGO_ETIQUETA[a.cargo], alinear: 'left' },
+    { titulo: 'Sede', peso: 12, valor: (a) => a.sede, alinear: 'left' },
     { titulo: 'Marca', peso: 5, valor: (a) => a.codigo, negrita: true },
     { titulo: 'Tipo', peso: 14, valor: (a) => a.tipo, alinear: 'left' },
   ];
-  tabla(doc, colDetalle, ausencias.detalle, { titulo: 'Detalle día por día', vacio });
+  if (hayAusencias) tabla(doc, colDetalle, ausencias.detalle, { titulo: 'Detalle día por día', vacio });
 
   return terminar(`Generado el ${datos.generadoEn}`);
 }

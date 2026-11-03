@@ -1,217 +1,190 @@
-import PDFDocument from 'pdfkit';
 import { CARGO_ETIQUETA, type CargoBase } from '../../../shared/domain.js';
 import type { Distribucion, SedeRol } from '../../rol/rol.types.js';
+import { faltaPersonal, filasDeTotales } from '../datos/vistas.js';
 import type { ReporteDatos } from '../reportes.types.js';
+import {
+  COLOR,
+  MARGEN,
+  anchoUtil,
+  banda,
+  celda,
+  crearDocumento,
+  encabezado,
+  limiteInferior,
+  saltoSiNoCabe,
+  textoEnCaja,
+  type Doc,
+} from './comun.js';
 
-type Doc = PDFKit.PDFDocument;
+/** El documento oficial: un cuadro por sede (días × agentes), totales y la página de distribución con firma. */
 
-const MARGEN = 24;
-const ALTO_FILA = 13;
-const TINTA = '#141414';
-const ROJO = '#D70015';
-const LINEA = '#8C8C8C';
-const CABECERA = '#DCE6F2';
-const GRIS = '#F1F1F1';
-
-const ANCHO_N = 16;
-const ANCHO_NOMBRE = 132;
-const ANCHO_CARGO = 50;
-
-export function construirPdf(datos: ReporteDatos): Promise<Buffer> {
-  const doc = new PDFDocument({
-    size: 'A4', layout: 'landscape', margin: MARGEN, bufferPages: true,
-    info: { Title: `ROL DF – ${datos.rol.nombreMes}`, Author: datos.config.supervisor },
-  });
-  const partes: Buffer[] = [];
-  doc.on('data', (p: Buffer) => partes.push(p));
-  const terminado = new Promise<Buffer>((resolve) => doc.on('end', () => resolve(Buffer.concat(partes))));
-
-  encabezado(doc, datos);
-  for (const sede of datos.rol.sedes) tablaSede(doc, datos, sede);
-  paginaDistribucion(doc, datos);
-  piesDePagina(doc, datos);
-
-  doc.end();
-  return terminado;
-}
-
-const anchoUtil = (doc: Doc) => doc.page.width - MARGEN * 2;
-const limiteInferior = (doc: Doc) => doc.page.height - MARGEN - 18;
-
-function encabezado(doc: Doc, datos: ReporteDatos) {
-  doc.font('Helvetica-Bold').fontSize(15).fillColor(TINTA)
-    .text(`ROL DE SERVICIO – ${datos.rol.nombreMes.toUpperCase()}`, MARGEN, MARGEN, { width: anchoUtil(doc), align: 'center' });
-  doc.font('Helvetica').fontSize(9).fillColor('#444444')
-    .text(
-      `${datos.config.entidad.toUpperCase()}  ·  SUP. ${datos.config.supervisor.toUpperCase()}  ·  ${datos.corte}`,
-      { width: anchoUtil(doc), align: 'center' },
-    );
-  leyenda(doc, datos, doc.y + 6);
-  doc.y += 10;
-}
-
-function leyenda(doc: Doc, datos: ReporteDatos, y: number) {
-  let x = MARGEN;
-  doc.fontSize(7.5);
-  for (const c of datos.codigos) {
-    celda(doc, x, y, 16, 11, c.codigo, { fondo: c.colorFondo, texto: c.colorTexto, negrita: true });
-    doc.font('Helvetica').fillColor(TINTA).text(c.nombre, x + 19, y + 2, { lineBreak: false });
-    x += 22 + doc.widthOfString(c.nombre) + 12;
-  }
-  doc.y = y + 12;
-}
-
-interface EstiloCelda {
-  fondo?: string;
-  texto?: string;
-  negrita?: boolean;
-  alinear?: 'left' | 'center' | 'right';
-}
-
-function celda(doc: Doc, x: number, y: number, w: number, h: number, texto: string, estilo: EstiloCelda = {}) {
-  if (estilo.fondo && estilo.fondo.toUpperCase() !== '#FFFFFF') doc.rect(x, y, w, h).fill(estilo.fondo);
-  doc.lineWidth(0.5).strokeColor(LINEA).rect(x, y, w, h).stroke();
-  if (!texto) return;
-  const alinear = estilo.alinear ?? 'center';
-  const padding = alinear === 'center' ? 0 : 3;
-  doc.font(estilo.negrita ? 'Helvetica-Bold' : 'Helvetica').fillColor(estilo.texto ?? TINTA)
-    .text(texto, x + padding, y + (h - doc.currentLineHeight()) / 2 + 0.5, {
-      width: w - padding * 2, align: alinear, lineBreak: false, ellipsis: true,
-    });
-}
-
-function tablaSede(doc: Doc, datos: ReporteDatos, sede: SedeRol) {
-  const dias = datos.rol.dias;
-  const porCodigo = new Map(datos.codigos.map((c) => [c.codigo, c]));
-  const anchoDia = (anchoUtil(doc) - ANCHO_N - ANCHO_NOMBRE - ANCHO_CARGO) / Math.max(dias.length, 1);
-  const altoBloque = ALTO_FILA * (sede.filas.length + 5) + 10;
-
-  if (doc.y + altoBloque > limiteInferior(doc)) {
-    doc.addPage();
-    doc.y = MARGEN;
-  }
-
-  let y = doc.y;
-  const x0 = MARGEN;
-  const xDias = x0 + ANCHO_N + ANCHO_NOMBRE + ANCHO_CARGO;
-
-  // Banda de la sede
-  doc.rect(x0, y, anchoUtil(doc), ALTO_FILA + 2).fill('#2B2B2B');
-  doc.font('Helvetica-Bold').fontSize(8.5).fillColor('#FFFFFF')
-    .text(sede.nombre.toUpperCase(), x0 + 5, y + 3.5, { lineBreak: false });
-  y += ALTO_FILA + 2;
-
-  // Cabecera de días
-  doc.fontSize(7);
-  celda(doc, x0, y, ANCHO_N, ALTO_FILA * 2, 'N.º', { fondo: CABECERA, negrita: true });
-  celda(doc, x0 + ANCHO_N, y, ANCHO_NOMBRE, ALTO_FILA * 2, 'APELLIDOS Y NOMBRES', { fondo: CABECERA, negrita: true });
-  celda(doc, x0 + ANCHO_N + ANCHO_NOMBRE, y, ANCHO_CARGO, ALTO_FILA * 2, 'CARGO', { fondo: CABECERA, negrita: true });
-  dias.forEach((dia, i) => {
-    const rojo = dia.feriado !== null; // solo feriados; el domingo es un día normal
-    const estilo = { fondo: rojo ? ROJO : CABECERA, texto: rojo ? '#FFFFFF' : TINTA, negrita: true };
-    celda(doc, xDias + i * anchoDia, y, anchoDia, ALTO_FILA, String(dia.dia), estilo);
-    celda(doc, xDias + i * anchoDia, y + ALTO_FILA, anchoDia, ALTO_FILA, dia.letra, estilo);
-  });
-  y += ALTO_FILA * 2;
-
-  // Agentes
-  sede.filas.forEach((fila, n) => {
-    doc.fontSize(7);
-    celda(doc, x0, y, ANCHO_N, ALTO_FILA, String(n + 1));
-    celda(doc, x0 + ANCHO_N, y, ANCHO_NOMBRE, ALTO_FILA, fila.nombres, { negrita: true, alinear: 'left' });
-    celda(doc, x0 + ANCHO_N + ANCHO_NOMBRE, y, ANCHO_CARGO, ALTO_FILA, CARGO_ETIQUETA[fila.cargo].toUpperCase());
-    fila.marcas.forEach((codigo, i) => {
-      const estilo = codigo ? porCodigo.get(codigo) : undefined;
-      celda(doc, xDias + i * anchoDia, y, anchoDia, ALTO_FILA, codigo ?? '', {
-        fondo: estilo?.colorFondo, texto: estilo?.colorTexto, negrita: true,
-      });
-    });
-    y += ALTO_FILA;
-  });
-
-  // Totales
-  const totales: [string, number[]][] = [['TOTAL DÍA', sede.totales.dia], ['TOTAL NOCHE', sede.totales.noche]];
-  for (const [etiqueta, valores] of totales) {
-    doc.fontSize(7);
-    celda(doc, x0, y, ANCHO_N + ANCHO_NOMBRE + ANCHO_CARGO, ALTO_FILA, etiqueta, {
-      fondo: GRIS, negrita: true, alinear: 'right',
-    });
-    valores.forEach((v, i) => {
-      const alerta = etiqueta === 'TOTAL DÍA' && sede.totales.completos[i] && v < sede.minimoDia;
-      celda(doc, xDias + i * anchoDia, y, anchoDia, ALTO_FILA, String(v), {
-        fondo: GRIS, texto: alerta ? ROJO : TINTA, negrita: true,
-      });
-    });
-    y += ALTO_FILA;
-  }
-
-  doc.y = y + 10;
-}
-
+const ALTO_FILA = 14;
+const TAMANO = 7;
+const COLUMNAS = { n: 16, nombre: 128, cargo: 82 } as const;
+/** Un día nunca es más ancho que esto: con pocos días («avance hasta hoy») la tabla queda compacta. */
+const ANCHO_DIA_MAX = 24;
+const ANCHO_FIJO = COLUMNAS.n + COLUMNAS.nombre + COLUMNAS.cargo;
 const CARGOS_CUADRO: CargoBase[] = ['ARMADO', 'SIMPLE', 'FEMINA', 'SUPERVISOR'];
 
-function paginaDistribucion(doc: Doc, datos: ReporteDatos) {
-  const bloques: [string, Distribucion][] = [
-    ['TURNO DIURNO', datos.distribucionDia],
-    ['TURNO NOCTURNO', datos.distribucionNoche],
-  ];
+export function construirPdf(datos: ReporteDatos): Promise<Buffer> {
+  const { doc, terminar } = crearDocumento(`ROL DF – ${datos.rol.nombreMes}`, datos.config.supervisor);
+
+  encabezado(
+    doc,
+    `ROL DE SERVICIO – ${datos.rol.nombreMes.toUpperCase()}`,
+    `${datos.config.entidad.toUpperCase()}  ·  SUP. ${datos.config.supervisor.toUpperCase()}  ·  ${datos.corte}`,
+  );
+  leyenda(doc, datos);
+  for (const sede of datos.rol.sedes) tablaSede(doc, datos, sede);
+  paginaDistribucion(doc, datos);
+
+  return terminar(`Generado el ${datos.generadoEn}`);
+}
+
+/** Leyenda de marcas centrada bajo el título. */
+function leyenda(doc: Doc, datos: ReporteDatos): void {
+  const muestra = 16;
+  const separacion = 14;
+  doc.font('Helvetica').fontSize(7.5);
+  const anchos = datos.codigos.map((c) => muestra + 4 + doc.widthOfString(c.nombre));
+  const total = anchos.reduce((a, b) => a + b, 0) + separacion * (anchos.length - 1);
+  let x = MARGEN + Math.max(0, (anchoUtil(doc) - total) / 2);
+  const y = doc.y - 4;
+  datos.codigos.forEach((c, i) => {
+    celda(doc, x, y, muestra, 11, c.codigo, { fondo: c.colorFondo, color: c.colorTexto, negrita: true, tamano: 6.5 });
+    textoEnCaja(doc, c.nombre, x + muestra + 4, y, anchos[i]! - muestra - 4, 11, { tamano: 7.5, alinear: 'left', relleno: 0 });
+    x += anchos[i]! + separacion;
+  });
+  doc.y = y + 11 + 12;
+}
+
+function tablaSede(doc: Doc, datos: ReporteDatos, sede: SedeRol): void {
+  const dias = datos.rol.dias;
+  const porCodigo = new Map(datos.codigos.map((c) => [c.codigo, c]));
+  const anchoDia = Math.min(ANCHO_DIA_MAX, (anchoUtil(doc) - ANCHO_FIJO) / Math.max(dias.length, 1));
+  const anchoTabla = ANCHO_FIJO + anchoDia * dias.length;
+  const xDias = MARGEN + ANCHO_FIJO;
+  const altoCabecera = ALTO_FILA * 2;
+
+  const cabecera = (continua: boolean) => {
+    banda(doc, continua ? `${sede.nombre} (continúa)` : sede.nombre, ALTO_FILA + 3, anchoTabla);
+    const y = doc.y;
+    const titulo = { fondo: COLOR.cabecera, negrita: true, tamano: TAMANO };
+    celda(doc, MARGEN, y, COLUMNAS.n, altoCabecera, 'N.º', titulo);
+    celda(doc, MARGEN + COLUMNAS.n, y, COLUMNAS.nombre, altoCabecera, 'APELLIDOS Y NOMBRES', titulo);
+    celda(doc, MARGEN + COLUMNAS.n + COLUMNAS.nombre, y, COLUMNAS.cargo, altoCabecera, 'CARGO', titulo);
+    dias.forEach((dia, i) => {
+      // Solo los feriados van en rojo; el domingo es un día normal.
+      const estilo = dia.feriado
+        ? { fondo: COLOR.rojo, color: COLOR.blanco, negrita: true, tamano: TAMANO }
+        : titulo;
+      celda(doc, xDias + i * anchoDia, y, anchoDia, ALTO_FILA, String(dia.dia), estilo);
+      celda(doc, xDias + i * anchoDia, y + ALTO_FILA, anchoDia, ALTO_FILA, dia.letra, estilo);
+    });
+    doc.y = y + altoCabecera;
+  };
+
+  // La sede empieza en una hoja nueva si no caben su cabecera, unas filas y los totales.
+  saltoSiNoCabe(doc, ALTO_FILA + 3 + altoCabecera + ALTO_FILA * Math.min(sede.filas.length + 2, 6));
+  cabecera(false);
+
+  sede.filas.forEach((fila, n) => {
+    if (saltoSiNoCabe(doc, ALTO_FILA)) cabecera(true);
+    const y = doc.y;
+    const cebra = n % 2 === 1 ? COLOR.cebra : undefined;
+    celda(doc, MARGEN, y, COLUMNAS.n, ALTO_FILA, String(n + 1), { fondo: cebra, tamano: TAMANO, color: COLOR.gris });
+    celda(doc, MARGEN + COLUMNAS.n, y, COLUMNAS.nombre, ALTO_FILA, fila.nombres, {
+      fondo: cebra, negrita: true, alinear: 'left', tamano: TAMANO,
+    });
+    celda(doc, MARGEN + COLUMNAS.n + COLUMNAS.nombre, y, COLUMNAS.cargo, ALTO_FILA, CARGO_ETIQUETA[fila.cargo].toUpperCase(), {
+      fondo: cebra, tamano: 6.5, minimo: 5,
+    });
+    fila.marcas.forEach((codigo, i) => {
+      const marca = codigo ? porCodigo.get(codigo) : undefined;
+      celda(doc, xDias + i * anchoDia, y, anchoDia, ALTO_FILA, codigo ?? '', {
+        fondo: marca?.colorFondo ?? cebra, color: marca?.colorTexto, negrita: true, tamano: TAMANO,
+      });
+    });
+    doc.y = y + ALTO_FILA;
+  });
+
+  for (const total of filasDeTotales(sede)) {
+    if (saltoSiNoCabe(doc, ALTO_FILA)) cabecera(true);
+    const y = doc.y;
+    celda(doc, MARGEN, y, ANCHO_FIJO, ALTO_FILA, total.etiqueta, { fondo: COLOR.suave, negrita: true, alinear: 'right', tamano: TAMANO });
+    total.valores.forEach((v, i) => {
+      celda(doc, xDias + i * anchoDia, y, anchoDia, ALTO_FILA, String(v), {
+        fondo: COLOR.suave, color: faltaPersonal(sede, total, i) ? COLOR.rojo : COLOR.tinta, negrita: true, tamano: TAMANO,
+      });
+    });
+    doc.y = y + ALTO_FILA;
+  }
+  doc.y += 12;
+}
+
+function paginaDistribucion(doc: Doc, datos: ReporteDatos): void {
+  const bloques = (
+    [
+      ['TURNO DIURNO', datos.distribucionDia],
+      ['TURNO NOCTURNO', datos.distribucionNoche],
+    ] as [string, Distribucion][]
+  ).filter(([, d]) => d.totales.total > 0);
   doc.addPage();
   doc.y = MARGEN;
 
-  const anchos = [26, 330, 66, 66, 66, 74, 60];
+  const anchos = [28, 330, 70, 70, 70, 78, 64];
   const anchoTabla = anchos.reduce((a, b) => a + b, 0);
   const x0 = MARGEN + (anchoUtil(doc) - anchoTabla) / 2;
-  const alto = 18;
+
+  // Las filas se ajustan para que los cuadros y la firma entren en una sola hoja (entre 13 y 18 pt).
+  const ALTO_TITULO = 40;
+  const SEPARACION = 20;
+  const ALTO_FIRMA = 70;
+  const filasTotales = bloques.reduce((n, [, d]) => n + d.sedes.length + 2, 0);
+  const libre = limiteInferior(doc) - MARGEN - ALTO_FIRMA - bloques.length * (ALTO_TITULO + SEPARACION);
+  // Redondeado hacia abajo: los decimales sobrantes harían saltar la firma a otra hoja por una fracción de punto.
+  const alto = Math.max(13, Math.min(18, Math.floor((libre / Math.max(filasTotales, 1)) * 10) / 10));
+  const tamano = alto >= 16 ? 9 : 8;
 
   for (const [nombre, distribucion] of bloques) {
-    if (distribucion.totales.total === 0) continue;
-    if (doc.y + alto * (distribucion.sedes.length + 4) > limiteInferior(doc)) {
-      doc.addPage();
-      doc.y = MARGEN;
-    }
-    doc.font('Helvetica-Bold').fontSize(13).fillColor(TINTA)
-      .text(`DISTRIBUCIÓN DE AGENTES – ${nombre}`, MARGEN, doc.y, { width: anchoUtil(doc), align: 'center' });
-    doc.fontSize(10).text(`SUP. ${datos.config.supervisor.toUpperCase()}`, { width: anchoUtil(doc), align: 'center' });
-    let y = doc.y + 8;
+    saltoSiNoCabe(doc, ALTO_TITULO + alto * (distribucion.sedes.length + 2));
+    textoEnCaja(doc, `DISTRIBUCIÓN DE AGENTES – ${nombre}`, MARGEN, doc.y, anchoUtil(doc), 18, { tamano: 13, negrita: true });
+    textoEnCaja(doc, `SUP. ${datos.config.supervisor.toUpperCase()}`, MARGEN, doc.y + 18, anchoUtil(doc), 14, {
+      tamano: 9.5, color: COLOR.gris,
+    });
+    doc.y += ALTO_TITULO; // título (18) + supervisor (14) + aire (8)
 
-    const filaTabla = (valores: string[], estilo: EstiloCelda) => {
+    const fila = (valores: string[], estilo: (i: number) => Parameters<typeof celda>[6]) => {
+      const y = doc.y;
       let x = x0;
       valores.forEach((v, i) => {
-        celda(doc, x, y, anchos[i]!, alto, v, { ...estilo, alinear: i === 1 ? 'left' : 'center' });
+        celda(doc, x, y, anchos[i]!, alto, v, { tamano, alinear: i === 1 ? 'left' : 'center', ...estilo(i) });
         x += anchos[i]!;
       });
-      y += alto;
+      doc.y = y + alto;
     };
 
-    doc.fontSize(9);
-    filaTabla(['N.º', 'Sede / Dependencia', 'Armado', 'Simple', 'Fémina', 'Supervisor', 'Total'], {
-      fondo: CABECERA, negrita: true,
-    });
+    fila(['N.º', 'Sede / Dependencia', 'Armado', 'Simple', 'Fémina', 'Supervisor', 'Total'], () => ({
+      fondo: COLOR.cabecera, negrita: true,
+    }));
     distribucion.sedes.forEach((s, n) =>
-      filaTabla([String(n + 1), s.nombre, ...CARGOS_CUADRO.map((c) => String(s.porCargo[c])), String(s.total)], {}),
+      fila([String(n + 1), s.nombre, ...CARGOS_CUADRO.map((c) => String(s.porCargo[c])), String(s.total)], (i) => ({
+        fondo: n % 2 === 1 ? COLOR.cebra : undefined,
+        negrita: i === 6,
+        color: i >= 2 && s.porCargo[CARGOS_CUADRO[i - 2]!] === 0 ? COLOR.tenue : COLOR.tinta,
+      })),
     );
-    filaTabla(
-      ['', 'TOTAL', ...CARGOS_CUADRO.map((c) => String(distribucion.totales[c])), String(distribucion.totales.total)],
-      { fondo: GRIS, negrita: true },
-    );
-    doc.y = y + 22;
+    fila(['', 'TOTAL', ...CARGOS_CUADRO.map((c) => String(distribucion.totales[c])), String(distribucion.totales.total)], () => ({
+      fondo: COLOR.suave, negrita: true,
+    }));
+    doc.y += SEPARACION;
   }
 
-  // Firma
-  const yFirma = Math.min(Math.max(doc.y + 30, doc.page.height - 120), limiteInferior(doc) - 30);
+  // Línea de firma: abajo de la hoja; si los cuadros no le dejan lugar, en una hoja propia (nunca encima de una tabla).
+  saltoSiNoCabe(doc, ALTO_FIRMA);
+  const yFirma = Math.max(doc.y + 40, Math.min(doc.page.height - 130, limiteInferior(doc) - 30));
   const centro = doc.page.width / 2;
-  doc.lineWidth(0.8).strokeColor(TINTA).moveTo(centro - 110, yFirma).lineTo(centro + 110, yFirma).stroke();
-  doc.font('Helvetica-Bold').fontSize(9).fillColor(TINTA)
-    .text(`SUP. ${datos.config.supervisor.toUpperCase()}`, centro - 110, yFirma + 4, { width: 220, align: 'center' });
-}
-
-function piesDePagina(doc: Doc, datos: ReporteDatos) {
-  const rango = doc.bufferedPageRange();
-  for (let i = 0; i < rango.count; i++) {
-    doc.switchToPage(rango.start + i);
-    const y = doc.page.height - MARGEN - 8;
-    doc.font('Helvetica').fontSize(7).fillColor('#666666');
-    doc.text(`Generado el ${datos.generadoEn}`, MARGEN, y, { lineBreak: false });
-    doc.text(`Página ${i + 1} de ${rango.count}`, MARGEN, y, { width: anchoUtil(doc), align: 'right', lineBreak: false });
-  }
+  doc.lineWidth(0.8).strokeColor(COLOR.tinta).moveTo(centro - 120, yFirma).lineTo(centro + 120, yFirma).stroke();
+  textoEnCaja(doc, `SUP. ${datos.config.supervisor.toUpperCase()}`, centro - 120, yFirma + 3, 240, 14, { tamano: 9, negrita: true });
+  textoEnCaja(doc, datos.config.entidad.toUpperCase(), centro - 120, yFirma + 16, 240, 12, { tamano: 7.5, color: COLOR.gris });
 }

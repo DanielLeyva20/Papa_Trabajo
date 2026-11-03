@@ -24,6 +24,8 @@ export interface SedeRol {
   filas: FilaRol[];
   /** completos[i]: todos los que debían venir ese día ya tienen marca. */
   totales: { dia: number[]; noche: number[]; completos: boolean[] };
+  /** Solo en reportes por turno: el cuadro tiene únicamente agentes de este turno. */
+  turno?: Turno;
 }
 
 /** Un agente marcado de turno en más de una sede el mismo día. */

@@ -2,6 +2,7 @@ import ExcelJS, { type Borders, type Cell, type Worksheet } from 'exceljs';
 import { CARGO_ETIQUETA, type CargoBase } from '../../../shared/domain.js';
 import type { CodigoTurno } from '../../codigos/codigos.service.js';
 import type { Distribucion } from '../../rol/rol.types.js';
+import { faltaPersonal, filasDeTotales } from '../datos/vistas.js';
 import type { ReporteDatos } from '../reportes.types.js';
 
 const ROJO = 'FFD70015';
@@ -53,7 +54,7 @@ function hojaRol(hoja: Worksheet, datos: ReporteDatos) {
 
   hoja.getColumn(1).width = 5;
   hoja.getColumn(2).width = 30;
-  hoja.getColumn(3).width = 13;
+  hoja.getColumn(3).width = 20; // cabe «FÉMINA DESCANSERA»
   for (let c = primeraDia; c <= ultimaDia; c++) hoja.getColumn(c).width = 4.6;
   hoja.getColumn(colDias).width = 7;
   hoja.getColumn(colDias + 1).width = 7;
@@ -166,15 +167,12 @@ function hojaRol(hoja: Worksheet, datos: ReporteDatos) {
     const finAgentes = fila - 1;
 
     // Totales por día con fórmulas: siguen funcionando si se edita el Excel a mano.
-    const totales: [string, string[], number[]][] = [
-      ['TOTAL DÍA', codigosDe(codigos, 'DIA'), sede.totales.dia],
-      ['TOTAL NOCHE', codigosDe(codigos, 'NOCHE'), sede.totales.noche],
-    ];
-    for (const [etiqueta, codigosCategoria, valores] of totales) {
+    for (const total of filasDeTotales(sede)) {
+      const codigosCategoria = codigosDe(codigos, total.categoria);
       const r = hoja.getRow(fila);
       hoja.mergeCells(fila, 1, fila, 3);
       const rotulo = r.getCell(1);
-      rotulo.value = etiqueta;
+      rotulo.value = total.etiqueta;
       pintar(rotulo, GRIS, TINTA, true);
       rotulo.alignment = { horizontal: 'right', vertical: 'middle', indent: 1 };
       rotulo.border = LINEA;
@@ -184,9 +182,8 @@ function hojaRol(hoja: Worksheet, datos: ReporteDatos) {
         const formula = sede.filas.length
           ? codigosCategoria.map((c) => `COUNTIF(${col}${inicioAgentes}:${col}${finAgentes},"${c}")`).join('+')
           : '0';
-        cell.value = { formula, result: valores[i] ?? 0 };
-        const falta = etiqueta === 'TOTAL DÍA' && sede.totales.completos[i] && (valores[i] ?? 0) < sede.minimoDia;
-        pintar(cell, GRIS, falta ? ROJO : TINTA, true);
+        cell.value = { formula, result: total.valores[i] ?? 0 };
+        pintar(cell, GRIS, faltaPersonal(sede, total, i) ? ROJO : TINTA, true);
         cell.border = LINEA;
         centrar(cell);
       });
